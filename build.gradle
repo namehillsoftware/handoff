@@ -20,8 +20,10 @@ def versionDetails = versionDetails()
 version = versionDetails.lastTag
 // .dockerignore and .gitignore may differ, which can lead to a clean branch looking dirty,
 // so use this custom algorithm for version snapshot/not-snapshot detection
+def isRelease = true
 if (versionDetails.commitDistance > 0 || versionDetails.branchName != 'master') {
 	version += "+$versionDetails.branchName-$versionDetails.commitDistance-SNAPSHOT"
+	isRelease = false
 }
 
 group = "com.namehillsoftware"
@@ -112,7 +114,7 @@ publishing {
 			// change URLs to point to your repos, e.g. http://my.org/repo
 			def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 			def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-			url = versionDetails.isCleanTag ? releasesRepoUrl : snapshotsRepoUrl
+			url = isRelease ? releasesRepoUrl : snapshotsRepoUrl
 			credentials {
 				username sonatypeUsername
 				password sonatypePassword
