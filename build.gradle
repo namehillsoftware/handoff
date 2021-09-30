@@ -18,6 +18,8 @@ repositories {
 
 def versionDetails = versionDetails()
 version = versionDetails.lastTag
+// .dockerignore and .gitignore may differ, which can lead to a clean branch looking dirty,
+// so use this custom algorithm for version snapshot/not-snapshot detection
 if (versionDetails.commitDistance > 0 || versionDetails.branchName != 'master') {
 	version += "+$versionDetails.branchName-$versionDetails.commitDistance-SNAPSHOT"
 }
