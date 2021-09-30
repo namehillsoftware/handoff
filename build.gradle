@@ -18,8 +18,10 @@ repositories {
 
 def versionDetails = versionDetails()
 version = versionDetails.lastTag
-if (!versionDetails.isCleanTag) {
-	version += "+$versionDetails.commitDistance-SNAPSHOT"
+// .dockerignore and .gitignore may differ, which can lead to a clean branch looking dirty,
+// so use this custom algorithm for version snapshot/not-snapshot detection
+if (versionDetails.commitDistance > 0 || versionDetails.branchName != 'master') {
+	version += "+$versionDetails.branchName-$versionDetails.commitDistance-SNAPSHOT"
 }
 
 group = "com.namehillsoftware"
