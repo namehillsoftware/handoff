@@ -26,9 +26,8 @@ implements
 	public final void respond(Message<Resolution> message) {
 		try {
 			final Promise<?> promisedAction = onFulfilled.promiseAction();
-			cancellationProxy.doCancel(promisedAction);
-
 			promisedAction.then(new InternalResolutionProxy<>(message), this);
+			cancellationProxy.doCancel(promisedAction);
 		} catch (Throwable error) {
 			reject(error);
 		}
