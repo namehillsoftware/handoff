@@ -4,7 +4,7 @@ import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 
 final class ImmediateActionResponse<Resolution> extends PromiseResponse<Resolution, Resolution> {
 
-    private ImmediateAction response;
+    private final ImmediateAction response;
 
     ImmediateActionResponse(ImmediateAction response) {
         this.response = response;

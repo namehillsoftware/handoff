@@ -39,7 +39,7 @@ implements
 		return null;
 	}
 
-	private final class InternalResolutionProxy<UnknownResolution> implements ImmediateResponse<UnknownResolution, Void> {
+	private final class InternalResolutionProxy<IgnoredResolution> implements ImmediateResponse<IgnoredResolution, Void> {
 
 		private final Message<Resolution> message;
 
@@ -48,7 +48,7 @@ implements
 		}
 
 		@Override
-		public Void respond(UnknownResolution resolution) {
+		public Void respond(IgnoredResolution resolution) {
 			if (message.rejection == null)
 				resolve(message.resolution);
 			else
