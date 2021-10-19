@@ -13,20 +13,18 @@ public abstract class SingleMessageBroadcaster<Resolution> extends CancellableBr
 	@SuppressWarnings("rawtypes")
 	private static final Set unhandledErrorCollectionInstance = Collections.singleton((RespondingMessenger)UnhandledRejectionDispatcher.instance);
 
-	private static volatile UnhandledRejectionsReceiver unhandledRejectionsReceiver;
-
-	protected static synchronized void setUnhandledRejectionsReceiver(UnhandledRejectionsReceiver receiver) {
-		SingleMessageBroadcaster.unhandledRejectionsReceiver = receiver;
+	protected static void setUnhandledRejectionsReceiver(UnhandledRejectionsReceiver receiver) {
+		SingleMessageBroadcaster.UnhandledRejectionDispatcher.unhandledRejectionsReceiver = receiver;
 	}
 
 	private final Queue<RespondingMessenger<Resolution>> respondingMessengers = new ConcurrentLinkedQueue<>();
-
-	private final AtomicReference<Message<Resolution>> atomicMessage = new AtomicReference<>();
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	private Queue<RespondingMessenger<Resolution>> unhandledErrorQueue = new ConcurrentLinkedQueue<>(unhandledErrorCollectionInstance);
 
 	private final AtomicReference<Queue<RespondingMessenger<Resolution>>> recipients = new AtomicReference<>(unhandledErrorQueue);
+
+	private final AtomicReference<Message<Resolution>> atomicMessage = new AtomicReference<>();
 
 	protected final void awaitResolution(RespondingMessenger<Resolution> recipient) {
 		recipients.compareAndSet(unhandledErrorQueue, respondingMessengers);
@@ -54,6 +52,8 @@ public abstract class SingleMessageBroadcaster<Resolution> extends CancellableBr
 
 	@SuppressWarnings("rawtypes")
 	private static final class UnhandledRejectionDispatcher implements RespondingMessenger {
+
+		private static volatile UnhandledRejectionsReceiver unhandledRejectionsReceiver;
 
 		private static final UnhandledRejectionDispatcher instance = new UnhandledRejectionDispatcher();
 
