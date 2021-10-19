@@ -14,10 +14,9 @@ abstract class EventualResponse<Resolution, Response> extends PromiseResponse<Re
 
     protected final void proxy(Promise<Response> promisedResponse) {
         try {
-            cancellationProxy.doCancel(promisedResponse);
-
-            promisedResponse.then(resolutionProxy, rejectionProxy);
-        } catch (Throwable throwable) {
+			promisedResponse.then(resolutionProxy, rejectionProxy);
+			cancellationProxy.doCancel(promisedResponse);
+		} catch (Throwable throwable) {
             reject(throwable);
         }
     }

@@ -4,20 +4,21 @@ package com.namehillsoftware.handoff.promises.propagation;
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.Promise;
 
-public class PromiseProxy<Resolution> {
+public final class PromiseProxy<Resolution> {
 
-	private final Messenger<Resolution> messenger;
 	private final CancellationProxy cancellationProxy = new CancellationProxy();
+	private final ResolutionProxy<Resolution> resolutionProxy;
+	private final RejectionProxy rejectionProxy;
 
 	public PromiseProxy(Messenger<Resolution> messenger) {
-		this.messenger = messenger;
+		resolutionProxy = new ResolutionProxy<>(messenger);
+		rejectionProxy = new RejectionProxy(messenger);
 		messenger.cancellationRequested(cancellationProxy);
 	}
 
 	public void proxy(Promise<Resolution> promise) {
-		cancellationProxy.doCancel(promise);
+		promise.then(resolutionProxy, rejectionProxy);
 
-		promise.then(new ResolutionProxy<>(messenger));
-		promise.excuse(new RejectionProxy(messenger));
+		cancellationProxy.doCancel(promise);
 	}
 }

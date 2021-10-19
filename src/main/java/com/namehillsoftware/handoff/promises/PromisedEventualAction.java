@@ -26,9 +26,8 @@ implements
 	public final void respond(Message<Resolution> message) {
 		try {
 			final Promise<?> promisedAction = onFulfilled.promiseAction();
-			cancellationProxy.doCancel(promisedAction);
-
 			promisedAction.then(new InternalResolutionProxy<>(message), this);
+			cancellationProxy.doCancel(promisedAction);
 		} catch (Throwable error) {
 			reject(error);
 		}
@@ -40,7 +39,7 @@ implements
 		return null;
 	}
 
-	private final class InternalResolutionProxy<UnknownResolution> implements ImmediateResponse<UnknownResolution, Void> {
+	private final class InternalResolutionProxy<IgnoredResolution> implements ImmediateResponse<IgnoredResolution, Void> {
 
 		private final Message<Resolution> message;
 
@@ -49,7 +48,7 @@ implements
 		}
 
 		@Override
-		public Void respond(UnknownResolution resolution) {
+		public Void respond(IgnoredResolution resolution) {
 			if (message.rejection == null)
 				resolve(message.resolution);
 			else
