@@ -1,6 +1,8 @@
+[![Build Status](https://travis-ci.com/namehillsoftware/handoff.svg?branch=master)](https://travis-ci.com/namehillsoftware/handoff) [![Coverage Status](https://coveralls.io/repos/github/namehillsoftware/handoff/badge.svg)](https://coveralls.io/github/namehillsoftware/handoff) [![Download](https://api.bintray.com/packages/dvedvick/maven/handoff/images/download.svg)](https://bintray.com/dvedvick/maven/handoff/_latestVersion)
+
 # Handoff, an A+ like Promise Implementation for Java
 
-[![Build Status](https://travis-ci.com/namehillsoftware/handoff.svg?branch=master)](https://travis-ci.com/namehillsoftware/handoff) [![Coverage Status](https://coveralls.io/repos/github/namehillsoftware/handoff/badge.svg)](https://coveralls.io/github/namehillsoftware/handoff) [![Download](https://api.bintray.com/packages/dvedvick/maven/handoff/images/download.svg)](https://bintray.com/dvedvick/maven/handoff/_latestVersion)
+![Logo](./handshake.svg)
 
 Handoff is a simple, A+ like Promises implementation for Java. It allows easy control flow to be written for asynchronous processes in Java:
 
@@ -46,7 +48,7 @@ playlist.promiseFirstFile()
     });
 ```
 
-## Installation
+# Installation
 
 Handoff can be installed via Gradle:
 
@@ -56,9 +58,9 @@ dependencies {
 }
 ```
 
-## Usage
+# Usage
 
-### Promise Creation
+## Promise Creation
 
 Handoff makes it easy to make any asynchronous process a promise. Take for example an asynchronous OKHTTP3 call. The `Promise` class can be extended to wrap the OKHTTP3 callback interface:
 
