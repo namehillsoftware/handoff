@@ -8,10 +8,6 @@ abstract class EventualResponse<Resolution, Response> extends PromiseResponse<Re
     private final InternalRejectionProxy rejectionProxy = new InternalRejectionProxy();
     private final InternalResolutionProxy resolutionProxy = new InternalResolutionProxy();
 
-    EventualResponse() {
-		promisedCancellation().must(cancellationProxy);
-	}
-
     protected final void proxy(Promise<Response> promisedResponse) {
         try {
 			promisedResponse.then(resolutionProxy, rejectionProxy);
@@ -21,7 +17,12 @@ abstract class EventualResponse<Resolution, Response> extends PromiseResponse<Re
         }
     }
 
-    private final class InternalResolutionProxy implements ImmediateResponse<Response, Void> {
+	@Override
+	protected final void onCancelled() {
+		cancellationProxy.act();
+	}
+
+	private final class InternalResolutionProxy implements ImmediateResponse<Response, Void> {
 
         @Override
         public Void respond(Response resolution) {

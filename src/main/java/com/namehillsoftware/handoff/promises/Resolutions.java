@@ -4,7 +4,6 @@ import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.aggregation.AggregateCancellation;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedErrorExcuse;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedResultsResolver;
-import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
 import java.util.Collection;
@@ -17,9 +16,9 @@ final class Resolutions {
 
 	static final class AggregatePromiseResolver<Resolution> implements MessengerOperator<Collection<Resolution>> {
 
-		private final Collection<PromiseLike<Resolution>> promises;
+		private final Collection<Promise<Resolution>> promises;
 
-		AggregatePromiseResolver(Collection<PromiseLike<Resolution>> promises) {
+		AggregatePromiseResolver(Collection<Promise<Resolution>> promises) {
 			this.promises = promises;
 		}
 
@@ -38,14 +37,14 @@ final class Resolutions {
 		}
 	}
 
-	static final class HonorFirstPromise<Resolution> extends Promise<Resolution> implements ImmediateAction {
+	static final class HonorFirstPromise<Resolution> extends Promise<Resolution> {
 
-		private final Collection<PromiseLike<Resolution>> promises;
+		private final Collection<Promise<Resolution>> promises;
 		private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
         private boolean isCancelled;
 
-		HonorFirstPromise(Collection<PromiseLike<Resolution>> promises) {
+		HonorFirstPromise(Collection<Promise<Resolution>> promises) {
 			this.promises = promises;
 
 			ImmediateResponse<Resolution, Void> promiseProxy = resolution -> {
@@ -67,15 +66,13 @@ final class Resolutions {
 				return null;
 			};
 
-			for (PromiseLike<Resolution> promise : promises) {
+			for (Promise<Resolution> promise : promises) {
                 promise.then(promiseProxy, errorProxy);
 			}
-
-			promisedCancellation().must(this);
 		}
 
 		@Override
-		public void act() {
+		public void onCancelled() {
 			final Lock writeLock = readWriteLock.writeLock();
 			writeLock.lock();
 			try {
@@ -84,7 +81,7 @@ final class Resolutions {
 				writeLock.unlock();
 			}
 
-			for (PromiseLike<Resolution> promise : promises) promise.cancel();
+			for (Promise<Resolution> promise : promises) promise.cancel();
 			reject(new CancellationException());
 		}
 	}

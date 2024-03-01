@@ -2,7 +2,6 @@ package com.namehillsoftware.handoff.promises.aggregation;
 
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.PromiseLike;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
 import java.util.Collection;
@@ -18,12 +17,12 @@ public class CollectedResultsResolver<TResult> implements ImmediateResponse<TRes
 	private final int expectedResultSize;
 	private final Messenger<Collection<TResult>> collectionMessenger;
 
-	public CollectedResultsResolver(Messenger<Collection<TResult>> collectionMessenger, Collection<PromiseLike<TResult>> promises) {
+	public CollectedResultsResolver(Messenger<Collection<TResult>> collectionMessenger, Collection<Promise<TResult>> promises) {
 		this.collectionMessenger = collectionMessenger;
 
 		expectedResultSize = promises.size();
 
-		for (PromiseLike<TResult> promise : promises) promise.then(this);
+		for (Promise<TResult> promise : promises) promise.then(this);
 
 		if (promises.isEmpty())
 			collectionMessenger.sendResolution(Collections.emptyList());

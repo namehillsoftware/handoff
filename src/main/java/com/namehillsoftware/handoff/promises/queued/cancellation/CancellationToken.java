@@ -2,7 +2,6 @@ package com.namehillsoftware.handoff.promises.queued.cancellation;
 
 
 import com.namehillsoftware.handoff.promises.response.ImmediateAction;
-import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

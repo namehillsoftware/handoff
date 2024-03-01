@@ -3,7 +3,6 @@ package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsCancelled.Befor
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.MessengerOperator;
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.PromiseLike;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,7 +18,7 @@ public class WhenTheCancellationIsCalled {
 		final ExternallyResolvableOperator<String> resolvableTask = new ExternallyResolvableOperator<>();
 		final Promise<String> promise = new Promise<>(resolvableTask);
 
-		final PromiseLike<Object> cancellablePromise = promise.eventually((result) -> new Promise<>(messenger -> messenger.promisedCancellation().must(() -> messenger.sendRejection(thrownException))));
+		final Promise<Object> cancellablePromise = promise.eventually((result) -> new Promise<>(messenger -> messenger.promisedCancellation().must(() -> messenger.sendRejection(thrownException))));
 
 		cancellablePromise.excuse((exception) -> caughtException = exception);
 
