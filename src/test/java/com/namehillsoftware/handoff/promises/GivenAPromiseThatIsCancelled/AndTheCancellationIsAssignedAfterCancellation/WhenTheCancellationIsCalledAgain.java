@@ -19,7 +19,7 @@ public class WhenTheCancellationIsCalledAgain {
 
 		cancellablePromise.cancel();
 
-		messengerOperator.messenger.cancellationRequested(() -> isCancelled = true);
+		messengerOperator.messenger.promisedCancellation().must(() -> isCancelled = true);
 
 		cancellablePromise.cancel();
 	}

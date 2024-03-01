@@ -1,9 +1,12 @@
 package com.namehillsoftware.handoff.promises.queued.cancellation;
 
 
+import com.namehillsoftware.handoff.promises.response.ImmediateAction;
+import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CancellationToken implements Runnable {
+public class CancellationToken implements ImmediateAction {
 
 	private final AtomicBoolean isCancelled = new AtomicBoolean();
 
@@ -12,7 +15,7 @@ public class CancellationToken implements Runnable {
 	}
 
 	@Override
-	public void run() {
-		isCancelled.set(true);
+	public void act() {
+		isCancelled.lazySet(true);
 	}
 }

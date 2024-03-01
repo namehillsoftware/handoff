@@ -9,8 +9,8 @@ abstract class EventualResponse<Resolution, Response> extends PromiseResponse<Re
     private final InternalResolutionProxy resolutionProxy = new InternalResolutionProxy();
 
     EventualResponse() {
-        respondToCancellation(cancellationProxy);
-    }
+		promisedCancellation().must(cancellationProxy);
+	}
 
     protected final void proxy(Promise<Response> promisedResponse) {
         try {

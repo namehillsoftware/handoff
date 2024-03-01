@@ -18,8 +18,7 @@ implements
 
 	PromisedEventualAction(EventualAction onFulfilled) {
 		this.onFulfilled = onFulfilled;
-
-		respondToCancellation(cancellationProxy);
+		promisedCancellation().must(cancellationProxy);
 	}
 
 	@Override

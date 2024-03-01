@@ -22,16 +22,19 @@ public class WhenTheCancellationIsCalled {
 		public void sendRejection(Throwable error) {}
 
 		@Override
-		public void cancellationRequested(Runnable response) {
-			response.run();
+		public Promise<Void> promisedCancellation() {
+			return Promise.empty();
 		}
 	};
 	private static boolean unhandledRejection;
 
 	@BeforeClass
-	public static void before() {
+	public static void before() throws Throwable {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
-		final Promise<Object> promisedObject = new Promise<>((m) -> m.cancellationRequested(() -> m.sendRejection(new Exception())));
+		final Promise<Object> promisedObject = new Promise<>((m) -> m.promisedCancellation().then(c -> {
+			m.sendRejection(new Exception());
+			return null;
+		}));
 		final PromiseProxy<Object> proxy = new PromiseProxy<>(messenger);
 		proxy.proxy(promisedObject);
 	}

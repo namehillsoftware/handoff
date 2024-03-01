@@ -19,8 +19,8 @@ public class WhenTheCancellationIsAssignedTwice {
 		thrownException = new Exception();
 		final Promise<String> cancellablePromise = new Promise<>(
 			(messenger) -> {
-				messenger.cancellationRequested(() -> messenger.sendRejection(new Exception()));
-				messenger.cancellationRequested(() -> messenger.sendRejection(thrownException));
+				messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
+				messenger.promisedCancellation().must(() -> messenger.sendRejection(thrownException));
 			});
 
 		cancellablePromise.excuse((exception) -> caughtException = exception);

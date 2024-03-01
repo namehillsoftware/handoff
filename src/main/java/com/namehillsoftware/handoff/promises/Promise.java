@@ -2,16 +2,13 @@ package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
-import com.namehillsoftware.handoff.promises.response.EventualAction;
-import com.namehillsoftware.handoff.promises.response.ImmediateAction;
-import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
-import com.namehillsoftware.handoff.promises.response.PromisedResponse;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
+public class Promise<Resolution> extends PromiseLike<Resolution> {
+	private final CancellationPromise cancellationPromise = new CancellationPromise();
 
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
 		messengerOperator.send(new PromiseMessenger());
@@ -27,45 +24,14 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	public Promise() {}
 
-	private <NewResolution> Promise<NewResolution> then(PromiseResponse<Resolution, NewResolution> onFulfilled) {
-		awaitResolution(onFulfilled);
-
-		return onFulfilled;
+	protected final PromiseLike<Void> promisedCancellation() {
+		return cancellationPromise;
 	}
 
-	public final <NewResolution> Promise<NewResolution> then(ImmediateResponse<Resolution, NewResolution> onFulfilled) {
-		return then(new PromiseImmediateResponse<>(onFulfilled));
+	@Override
+	protected final void respondToCancellation() {
+		cancellationPromise.doCancellation();
 	}
-
-	public final <NewResolution> Promise<NewResolution> then(ImmediateResponse<Resolution, NewResolution> onFulfilled, ImmediateResponse<Throwable, NewResolution> onRejected) {
-		return then(new PromiseImmediateResponse<>(onFulfilled, onRejected));
-	}
-
-	public final <NewResolution> Promise<NewResolution> eventually(PromisedResponse<Resolution, NewResolution> onFulfilled) {
-		return then(new PromisedEventualResponse<>(onFulfilled));
-	}
-
-	public final <NewResolution> Promise<NewResolution> eventually(PromisedResponse<Resolution, NewResolution> onFulfilled, PromisedResponse<Throwable, NewResolution> onRejected) {
-		return then(new PromisedEventualResponse<>(onFulfilled, onRejected));
-	}
-
-	public final <NewResolution> Promise<NewResolution> excuse(ImmediateResponse<Throwable, NewResolution> onRejected) {
-		return then(new RejectedResponsePromise<>(onRejected));
-	}
-
-	public final <NewResolution> Promise<NewResolution> eventuallyExcuse(PromisedResponse<Throwable, NewResolution> onRejected) {
-		return then(new PromisedEventualRejection<>(onRejected));
-	}
-
-	public final Promise<Resolution> must(ImmediateAction onAny) {
-		return then(new ImmediateActionResponse<>(onAny));
-	}
-
-	public final Promise<Resolution> inevitably(EventualAction onAny) {
-		final PromisedEventualAction<Resolution> promisedEventualAction = new PromisedEventualAction<>(onAny);
-		awaitResolution(promisedEventualAction);
-		return promisedEventualAction;
-    }
 
 	@SuppressWarnings("unchecked")
 	public static <Resolution> Promise<Resolution> empty() {
@@ -73,20 +39,20 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 	}
 
 	@SafeVarargs
-	public static <Resolution> Promise<Collection<Resolution>> whenAll(Promise<Resolution>... promises) {
+	public static <Resolution> Promise<Collection<Resolution>> whenAll(PromiseLike<Resolution>... promises) {
 		return whenAll(Arrays.asList(promises));
 	}
 
-	public static <Resolution> Promise<Collection<Resolution>> whenAll(Collection<Promise<Resolution>> promises) {
+	public static <Resolution> Promise<Collection<Resolution>> whenAll(Collection<PromiseLike<Resolution>> promises) {
 		return new Promise<>(new Resolutions.AggregatePromiseResolver<>(promises));
 	}
 
 	@SafeVarargs
-	public static <Resolution> Promise<Resolution> whenAny(Promise<Resolution>... promises) {
+	public static <Resolution> Promise<Resolution> whenAny(PromiseLike<Resolution>... promises) {
 		return whenAny(Arrays.asList(promises));
 	}
 
-	public static <Resolution> Promise<Resolution> whenAny(Collection<Promise<Resolution>> promises) {
+	public static <Resolution> Promise<Resolution> whenAny(Collection<PromiseLike<Resolution>> promises) {
 		return new Resolutions.HonorFirstPromise<>(promises);
 	}
 
@@ -114,8 +80,14 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		}
 
 		@Override
-		public void cancellationRequested(Runnable response) {
-			respondToCancellation(response);
+		public PromiseLike<Void> promisedCancellation() {
+			return Promise.this.promisedCancellation();
+		}
+	}
+
+	private static class CancellationPromise extends PromiseLike<Void> {
+		public void doCancellation() {
+			resolve(null);
 		}
 	}
 }

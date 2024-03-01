@@ -1,6 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves.AndInevitablyFinishesWithAnAction.AndTheActionIsCancelled;
 
 import com.namehillsoftware.handoff.promises.Promise;
+import com.namehillsoftware.handoff.promises.PromiseLike;
 import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,13 +26,13 @@ public class WhenTheCancellationIsCalled {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
-		final Promise<Object> promise = new QueuedPromise<>(() -> {
+		final PromiseLike<Object> promise = new QueuedPromise<>(() -> {
 			if (!countDownLatch.await(10, TimeUnit.SECONDS))
 				throw new TimeoutException();
 
 			return new Object();
 		}, Executors.newSingleThreadExecutor())
-			.inevitably(() -> new Promise<>((m) -> m.cancellationRequested(() -> m.sendRejection(new Exception()))));
+			.inevitably(() -> new Promise<>((m) -> m.promisedCancellation().must(() -> m.sendRejection(new Exception()))));
 
 		promise.excuse(e -> null);
 

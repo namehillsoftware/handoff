@@ -1,6 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsCancelled.AfterThePromiseIsResolved;
 
 import com.namehillsoftware.handoff.promises.Promise;
+import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 public class WhenTheCancellationIsCalled {
 
-	private static final Runnable mockCancel = mock(Runnable.class);
+	private static final ImmediateAction mockCancel = mock(ImmediateAction.class);
 	private static final Object expectedResult = new Object();
 	private static Object result;
 
@@ -23,7 +24,7 @@ public class WhenTheCancellationIsCalled {
 	public static void before() {
 		final Promise<Object> cancellablePromise = new Promise<>(
 			(messenger) -> {
-				messenger.cancellationRequested(mockCancel);
+				messenger.promisedCancellation().must(mockCancel);
 				messenger.sendResolution(expectedResult);
 			});
 
@@ -34,7 +35,7 @@ public class WhenTheCancellationIsCalled {
 
 	@Test
 	public void thenTheCancellationIsNotCalled() {
-		verify(mockCancel, times(0)).run();
+		verify(mockCancel, times(0)).act();
 	}
 
 	@Test

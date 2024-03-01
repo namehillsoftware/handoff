@@ -1,6 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolvesInTheFuture;
 
 import com.namehillsoftware.handoff.promises.Promise;
+import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.*;
 public class WhenThePromiseIsCancelledAfterResolution {
 	private static Object result;
 	private static Object expectedResult;
-	private static Runnable cancellationRunnable;
+	private static ImmediateAction cancellationRunnable;
 
 	@BeforeClass
 	public static void before() throws InterruptedException {
@@ -37,7 +38,7 @@ public class WhenThePromiseIsCancelledAfterResolution {
 			});
 
 			cancellationRunnable = spy(new ThreadCanceller(myNewThread));
-			messenger.cancellationRequested(cancellationRunnable);
+			messenger.promisedCancellation().must(cancellationRunnable);
 
 			myNewThread.start();
 		});
@@ -56,10 +57,10 @@ public class WhenThePromiseIsCancelledAfterResolution {
 
 	@Test
 	public void thenTheCancellableIsNotCalled() {
-		verify(cancellationRunnable, times(0)).run();
+		verify(cancellationRunnable, times(0)).act();
 	}
 
-	private static class ThreadCanceller implements Runnable {
+	private static class ThreadCanceller implements ImmediateAction {
 		private final Thread myNewThread;
 
 		ThreadCanceller(Thread myNewThread) {
@@ -67,7 +68,7 @@ public class WhenThePromiseIsCancelledAfterResolution {
 		}
 
 		@Override
-		public void run() {
+		public void act() {
 			myNewThread.interrupt();
 		}
 	}
