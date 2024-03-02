@@ -56,7 +56,7 @@ public class WhenThePromiseIsCancelledBeforeResolution {
 	}
 
 	@Test
-	public void thenTheCancellableIsCalled() {
+	public void thenTheCancellableIsCalled() throws Throwable {
 		verify(cancellationRunnable, times(1)).act();
 	}
 

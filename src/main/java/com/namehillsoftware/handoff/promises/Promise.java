@@ -14,7 +14,13 @@ import java.util.Collection;
 public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
-		messengerOperator.send(new PromiseMessenger());
+		this(null, messengerOperator);
+	}
+
+	public Promise(CancellationResponse cancellationResponse, MessengerOperator<Resolution> messengerOperator) {
+		final PromiseMessenger messenger = new PromiseMessenger(cancellationResponse);
+		awaitCancellation(messenger);
+		messengerOperator.send(messenger);
 	}
 
 	public Promise(Resolution passThroughResult) {
@@ -75,10 +81,12 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		return then(new ImmediateActionResponse<>(onAny));
 	}
 
+	public final Promise<Resolution> must(ImmediateCancellableAction onAny) {
+		return then(new ImmediateCancellableActionResponse<>(onAny));
+	}
+
 	public final Promise<Resolution> inevitably(EventualAction onAny) {
-		final PromisedEventualAction<Resolution> promisedEventualAction = new PromisedEventualAction<>(onAny);
-		awaitResolution(promisedEventualAction);
-		return promisedEventualAction;
+		return then(new PromisedEventualAction<>(onAny));
 	}
 
 	protected void cancellationRequested() {}
@@ -106,23 +114,24 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		return new Resolutions.HonorFirstPromise<>(promises);
 	}
 
-	public static class Rejections {
+	public static final class Rejections {
 		public static void setUnhandledRejectionsReceiver(UnhandledRejectionsReceiver receiver) {
 			SingleMessageBroadcaster.setUnhandledRejectionsReceiver(receiver);
 		}
 	}
 
-	private static class LazyEmptyPromiseHolder {
+	private static final class LazyEmptyPromiseHolder {
 		@SuppressWarnings("rawtypes")
 		private static final Promise emptyPromiseInstance = new Promise<>((Object) null);
 	}
 
-	private class PromiseMessenger implements Messenger<Resolution> {
+	private final class PromiseMessenger implements Messenger<Resolution>, CancellationResponse {
 
 		private final CancellationToken cancellationToken = new CancellationToken();
+		private final CancellationResponse cancellationResponse;
 
-		public PromiseMessenger() {
-			Promise.this.awaitCancellation(cancellationToken);
+		public PromiseMessenger(CancellationResponse cancellationResponse) {
+			this.cancellationResponse = cancellationResponse;
 		}
 
 		@Override
@@ -139,9 +148,17 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		public CancellationToken promisedCancellation() {
 			return cancellationToken;
 		}
+
+		@Override
+		public void cancellationRequested() {
+			cancellationToken.cancel();
+			if (cancellationResponse != null)
+				cancellationResponse.cancellationRequested();
+			Promise.this.cancellationRequested();
+		}
 	}
 
-	private class ProtectedCancellationResponse implements CancellationResponse {
+	private final class ProtectedCancellationResponse implements CancellationResponse {
 
 		@Override
 		public void cancellationRequested() {

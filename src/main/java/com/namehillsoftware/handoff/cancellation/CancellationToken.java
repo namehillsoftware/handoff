@@ -5,7 +5,7 @@ import com.namehillsoftware.handoff.promises.Promise;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CancellationToken extends Promise<Void> implements CancellationSignal, Cancellable, CancellationResponse {
+public class CancellationToken extends Promise<Void> implements CancellationSignal, Cancellable {
 
 	private final AtomicBoolean isCancelled = new AtomicBoolean();
 
@@ -14,7 +14,7 @@ public class CancellationToken extends Promise<Void> implements CancellationSign
 	}
 
 	@Override
-	public void cancellationRequested() {
+	protected void cancellationRequested() {
 		isCancelled.lazySet(true);
 		resolve(null);
 	}

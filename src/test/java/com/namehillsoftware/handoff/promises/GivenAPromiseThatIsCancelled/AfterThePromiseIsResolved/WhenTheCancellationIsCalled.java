@@ -34,7 +34,7 @@ public class WhenTheCancellationIsCalled {
 	}
 
 	@Test
-	public void thenTheCancellationIsNotCalled() {
+	public void thenTheCancellationIsNotCalled() throws Throwable {
 		verify(mockCancel, times(0)).act();
 	}
 

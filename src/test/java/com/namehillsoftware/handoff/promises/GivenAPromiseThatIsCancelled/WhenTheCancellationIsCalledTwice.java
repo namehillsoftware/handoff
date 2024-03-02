@@ -21,7 +21,7 @@ public class WhenTheCancellationIsCalledTwice {
 	}
 
 	@Test
-	public void thenTheCancellationIsCalledOnce() {
+	public void thenTheCancellationIsCalledOnce() throws Throwable {
 		verify(mockCancel, times(1)).act();
 	}
 }

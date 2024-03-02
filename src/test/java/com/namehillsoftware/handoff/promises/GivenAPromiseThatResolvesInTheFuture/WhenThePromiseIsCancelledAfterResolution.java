@@ -56,7 +56,7 @@ public class WhenThePromiseIsCancelledAfterResolution {
 	}
 
 	@Test
-	public void thenTheCancellableIsNotCalled() {
+	public void thenTheCancellableIsNotCalled() throws Throwable {
 		verify(cancellationRunnable, times(0)).act();
 	}
 

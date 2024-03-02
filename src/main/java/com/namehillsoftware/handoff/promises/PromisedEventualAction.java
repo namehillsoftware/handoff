@@ -18,7 +18,6 @@ implements
 
 	PromisedEventualAction(EventualAction onFulfilled) {
 		cancellationProxy = new CancellationProxy();
-		awaitCancellation(cancellationProxy);
 		this.onFulfilled = onFulfilled;
 	}
 
@@ -37,6 +36,11 @@ implements
 	public Void respond(Throwable throwable) {
 		reject(throwable);
 		return null;
+	}
+
+	@Override
+	protected void cancellationRequested() {
+		cancellationProxy.cancel();
 	}
 
 	private final class InternalResolutionProxy<IgnoredResolution> implements ImmediateResponse<IgnoredResolution, Void> {
