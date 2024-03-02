@@ -1,6 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAProxiedPromiseThatIsCancelled.AndTheCancellationCreatesAnException;
 
 import com.namehillsoftware.handoff.Messenger;
+import com.namehillsoftware.handoff.cancellation.CancellationToken;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.propagation.PromiseProxy;
 import org.junit.BeforeClass;
@@ -22,8 +23,8 @@ public class WhenTheCancellationIsCalled {
 		public void sendRejection(Throwable error) {}
 
 		@Override
-		public Promise<Void> promisedCancellation() {
-			return Promise.empty();
+		public CancellationToken cancellation() {
+			return new CancellationToken();
 		}
 	};
 	private static boolean unhandledRejection;
@@ -31,7 +32,7 @@ public class WhenTheCancellationIsCalled {
 	@BeforeClass
 	public static void before() throws Throwable {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
-		final Promise<Object> promisedObject = new Promise<>((m) -> m.promisedCancellation().then(c -> {
+		final Promise<Object> promisedObject = new Promise<>((m) -> m.cancellation().then(c -> {
 			m.sendRejection(new Exception());
 			return null;
 		}));

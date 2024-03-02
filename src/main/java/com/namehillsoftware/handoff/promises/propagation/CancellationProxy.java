@@ -1,29 +1,32 @@
 package com.namehillsoftware.handoff.promises.propagation;
 
 
+import com.namehillsoftware.handoff.cancellation.CancellationToken;
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.queued.cancellation.CancellationToken;
-import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
+import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public final class CancellationProxy extends CancellationToken {
+public final class CancellationProxy extends CancellationToken implements ImmediateAction {
 	private final Queue<Promise<?>> cancellablePromises = new ConcurrentLinkedQueue<>();
 
-	public CancellationProxy doCancel(Promise<?> promise) {
+	public void doCancel(Promise<?> promise) {
 		cancellablePromises.offer(promise);
 
-		if (isCancelled()) act();
+		if (isCancelled()) cancellationRequested();
+	}
 
-		return this;
+	@Override
+	protected void cancellationRequested() {
+		super.cancellationRequested();
+		Promise<?> cancellingPromise;
+		while ((cancellingPromise = cancellablePromises.poll()) != null)
+			cancellingPromise.cancel();
 	}
 
 	@Override
 	public void act() {
-		Promise<?> cancellingPromise;
-		while ((cancellingPromise = cancellablePromises.poll()) != null)
-			cancellingPromise.cancel();
-		super.act();
+		cancel();
 	}
 }

@@ -1,9 +1,10 @@
 package com.namehillsoftware.handoff;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
+import com.namehillsoftware.handoff.cancellation.Cancellable;
 
-abstract class CancellableBroadcaster<Resolution> {
+import java.util.concurrent.atomic.AtomicBoolean;
+
+abstract class CancellableBroadcaster<Resolution> implements Cancellable {
     private final AtomicBoolean isCancellationClosed = new AtomicBoolean();
 
     protected final void reject(Throwable error) {
@@ -26,5 +27,5 @@ abstract class CancellableBroadcaster<Resolution> {
         	respondToCancellation();
     }
 
-    protected void respondToCancellation() {}
+    protected abstract void respondToCancellation();
 }

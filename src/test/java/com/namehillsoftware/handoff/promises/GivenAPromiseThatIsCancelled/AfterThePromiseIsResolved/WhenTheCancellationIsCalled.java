@@ -24,7 +24,7 @@ public class WhenTheCancellationIsCalled {
 	public static void before() {
 		final Promise<Object> cancellablePromise = new Promise<>(
 			(messenger) -> {
-				messenger.promisedCancellation().must(mockCancel);
+				messenger.cancellation().must(mockCancel);
 				messenger.sendResolution(expectedResult);
 			});
 

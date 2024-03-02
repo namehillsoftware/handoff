@@ -2,7 +2,7 @@ package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.promises.response.PromisedResponse;
 
-class PromisedEventualResponse<Resolution, Response> extends EventualResponse<Resolution, Response> {
+class PromisedEventualResponse<Resolution, Response> extends EventuallyRespondingMessenger<Resolution, Response> {
 
 	private final PromisedResponse<Resolution, Response> onFulfilled;
 	private final PromisedResponse<Throwable, Response> onRejected;

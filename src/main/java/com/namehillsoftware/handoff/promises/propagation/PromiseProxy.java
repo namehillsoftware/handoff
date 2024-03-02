@@ -13,10 +13,10 @@ public final class PromiseProxy<Resolution> {
 	public PromiseProxy(Messenger<Resolution> messenger) {
 		resolutionProxy = new ResolutionProxy<>(messenger);
 		rejectionProxy = new RejectionProxy(messenger);
-		messenger.promisedCancellation().must(cancellationProxy);
+		messenger.cancellation().must(cancellationProxy);
 	}
 
-	public void proxy(Promise<Resolution> promise) throws Throwable {
+	public void proxy(Promise<Resolution> promise) {
 		promise.then(resolutionProxy, rejectionProxy);
 
 		cancellationProxy.doCancel(promise);

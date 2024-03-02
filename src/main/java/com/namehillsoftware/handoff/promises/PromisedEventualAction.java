@@ -2,6 +2,7 @@ package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Message;
 import com.namehillsoftware.handoff.RespondingMessenger;
+import com.namehillsoftware.handoff.cancellation.CancellationToken;
 import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
 import com.namehillsoftware.handoff.promises.response.EventualAction;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
@@ -13,10 +14,11 @@ implements
 	RespondingMessenger<Resolution>,
 	ImmediateResponse<Throwable, Void> {
 
-	private final CancellationProxy cancellationProxy = new CancellationProxy();
+	private CancellationProxy cancellationProxy;
 	private final EventualAction onFulfilled;
 
 	PromisedEventualAction(EventualAction onFulfilled) {
+		super(new CancellationProxy());
 		this.onFulfilled = onFulfilled;
 	}
 
@@ -38,8 +40,8 @@ implements
 	}
 
 	@Override
-	protected final void onCancelled() {
-		cancellationProxy.act();
+	protected void initialize(CancellationToken cancellationToken) {
+		cancellationProxy = (CancellationProxy) cancellationToken;
 	}
 
 	private final class InternalResolutionProxy<IgnoredResolution> implements ImmediateResponse<IgnoredResolution, Void> {

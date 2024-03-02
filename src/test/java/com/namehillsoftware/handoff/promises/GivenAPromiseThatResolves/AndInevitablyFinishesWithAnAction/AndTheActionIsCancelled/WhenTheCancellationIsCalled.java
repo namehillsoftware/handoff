@@ -2,11 +2,11 @@ package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves.AndInevi
 
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
+import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -30,8 +30,8 @@ public class WhenTheCancellationIsCalled {
 				throw new TimeoutException();
 
 			return new Object();
-		}, Executors.newSingleThreadExecutor())
-			.inevitably(() -> new Promise<>((m) -> m.promisedCancellation().must(() -> m.sendRejection(new Exception()))));
+		}, TestExecutors.TEST_EXECUTOR)
+			.inevitably(() -> new Promise<>((m) -> m.cancellation().must(() -> m.sendRejection(new Exception()))));
 
 		promise.excuse(e -> null);
 

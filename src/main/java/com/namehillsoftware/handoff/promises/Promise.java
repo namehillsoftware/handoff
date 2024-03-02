@@ -1,11 +1,10 @@
 package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Messenger;
+import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
-import com.namehillsoftware.handoff.promises.response.EventualAction;
-import com.namehillsoftware.handoff.promises.response.ImmediateAction;
-import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
-import com.namehillsoftware.handoff.promises.response.PromisedResponse;
+import com.namehillsoftware.handoff.cancellation.CancellationToken;
+import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
 
 import java.util.Arrays;
@@ -13,12 +12,11 @@ import java.util.Collection;
 
 public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
-	private final CancellationPromise cancellationPromise;
+	private final CancellationToken cancellationToken;
 
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
-		final PromiseMessenger messenger = new PromiseMessenger();
-		cancellationPromise = messenger.cancellationPromise;
-		messengerOperator.send(messenger);
+		this();
+		messengerOperator.send(new PromiseMessenger());
 	}
 
 	public Promise(Resolution passThroughResult) {
@@ -32,10 +30,15 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 	}
 
 	public Promise() {
-		cancellationPromise = null;
+		this(new CancellationToken());
 	}
 
-	private <NewResolution> Promise<NewResolution> then(PromiseResponse<Resolution, NewResolution> onFulfilled) {
+	protected Promise(CancellationToken cancellationToken) {
+		this.cancellationToken = cancellationToken;
+		initialize(cancellationToken);
+	}
+
+	private <NewResolution, PromisedResolution extends Promise<NewResolution> & RespondingMessenger<Resolution>> PromisedResolution then(PromisedResolution onFulfilled) {
 		awaitResolution(onFulfilled);
 
 		return onFulfilled;
@@ -45,8 +48,16 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		return then(new PromiseImmediateResponse<>(onFulfilled));
 	}
 
+	public final <NewResolution> Promise<NewResolution> then(ImmediateCancellableResponse<Resolution, NewResolution> onFulfilled) {
+		return then(new PromiseImmediateCancellableResponse<>(onFulfilled));
+	}
+
 	public final <NewResolution> Promise<NewResolution> then(ImmediateResponse<Resolution, NewResolution> onFulfilled, ImmediateResponse<Throwable, NewResolution> onRejected) {
 		return then(new PromiseImmediateResponse<>(onFulfilled, onRejected));
+	}
+
+	public final <NewResolution> Promise<NewResolution> then(ImmediateCancellableResponse<Resolution, NewResolution> onFulfilled, ImmediateCancellableResponse<Throwable, NewResolution> onRejected) {
+		return then(new PromiseImmediateCancellableResponse<>(onFulfilled, onRejected));
 	}
 
 	public final <NewResolution> Promise<NewResolution> eventually(PromisedResponse<Resolution, NewResolution> onFulfilled) {
@@ -59,6 +70,10 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	public final <NewResolution> Promise<NewResolution> excuse(ImmediateResponse<Throwable, NewResolution> onRejected) {
 		return then(new RejectedResponsePromise<>(onRejected));
+	}
+
+	public final <NewResolution> Promise<NewResolution> excuse(ImmediateCancellableResponse<Throwable, NewResolution> onRejected) {
+		return then(new RejectedCancellableResponsePromise<>(onRejected));
 	}
 
 	public final <NewResolution> Promise<NewResolution> eventuallyExcuse(PromisedResponse<Throwable, NewResolution> onRejected) {
@@ -77,13 +92,15 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	@Override
 	protected final void respondToCancellation() {
-		if (cancellationPromise != null)
-			cancellationPromise.doCancellation();
+		if (cancellationToken != null)
+			cancellationToken.cancel();
 
-		onCancelled();
+		cancellationRequested();
 	}
 
-	protected void onCancelled() {}
+	protected void initialize(CancellationToken cancellationToken) {}
+
+	protected void cancellationRequested() {}
 
 	@SuppressWarnings("unchecked")
 	public static <Resolution> Promise<Resolution> empty() {
@@ -121,8 +138,6 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	private class PromiseMessenger implements Messenger<Resolution> {
 
-		private final CancellationPromise cancellationPromise = new CancellationPromise();
-
 		@Override
 		public void sendResolution(Resolution resolution) {
 			resolve(resolution);
@@ -134,14 +149,8 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		}
 
 		@Override
-		public Promise<Void> promisedCancellation() {
-			return cancellationPromise;
-		}
-	}
-
-	private static class CancellationPromise extends Promise<Void> {
-		public void doCancellation() {
-			resolve(null);
+		public CancellationToken cancellation() {
+			return cancellationToken;
 		}
 	}
 }

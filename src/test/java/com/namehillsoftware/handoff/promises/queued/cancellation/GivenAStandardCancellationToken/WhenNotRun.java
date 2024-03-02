@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.queued.cancellation.GivenAStandardCancellationToken;
 
 
-import com.namehillsoftware.handoff.promises.queued.cancellation.CancellationToken;
+import com.namehillsoftware.handoff.cancellation.CancellationToken;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
