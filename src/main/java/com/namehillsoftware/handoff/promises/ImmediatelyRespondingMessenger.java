@@ -13,6 +13,10 @@ implements
 
 	private final CancellationToken cancellationToken = new CancellationToken();
 
+	ImmediatelyRespondingMessenger() {
+		awaitCancellation(cancellationToken);
+	}
+
 	@Override
 	public final void respond(Message<Resolution> message) {
 		try {
@@ -23,11 +27,6 @@ implements
 		} catch (Throwable error) {
 			reject(error);
 		}
-	}
-
-	@Override
-	protected void cancellationRequested() {
-		cancellationToken.cancel();
 	}
 
 	protected abstract void respond(Resolution resolution, CancellationSignal cancellationSignal) throws Throwable;

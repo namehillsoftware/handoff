@@ -13,11 +13,11 @@ implements
 	RespondingMessenger<Resolution>,
 	ImmediateResponse<Throwable, Void> {
 
+	private final CancellationProxy cancellationProxy = new CancellationProxy();
 	private final EventualAction onFulfilled;
-	private final CancellationProxy cancellationProxy;
 
 	PromisedEventualAction(EventualAction onFulfilled) {
-		cancellationProxy = new CancellationProxy();
+		awaitCancellation(cancellationProxy);
 		this.onFulfilled = onFulfilled;
 	}
 
@@ -36,11 +36,6 @@ implements
 	public Void respond(Throwable throwable) {
 		reject(throwable);
 		return null;
-	}
-
-	@Override
-	protected void cancellationRequested() {
-		cancellationProxy.cancel();
 	}
 
 	private final class InternalResolutionProxy<IgnoredResolution> implements ImmediateResponse<IgnoredResolution, Void> {

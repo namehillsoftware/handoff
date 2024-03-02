@@ -31,9 +31,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		reject(rejection);
 	}
 
-	protected Promise() {
-		awaitCancellation(new ProtectedCancellationResponse());
-	}
+	protected Promise() {}
 
 	private <NewResolution, PromisedResolution extends Promise<NewResolution> & RespondingMessenger<Resolution>> PromisedResolution then(PromisedResolution onFulfilled) {
 		awaitResolution(onFulfilled);
@@ -88,8 +86,6 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 	public final Promise<Resolution> inevitably(EventualAction onAny) {
 		return then(new PromisedEventualAction<>(onAny));
 	}
-
-	protected void cancellationRequested() {}
 
 	@SuppressWarnings("unchecked")
 	public static <Resolution> Promise<Resolution> empty() {
@@ -154,15 +150,6 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			cancellationToken.cancel();
 			if (cancellationResponse != null)
 				cancellationResponse.cancellationRequested();
-			Promise.this.cancellationRequested();
-		}
-	}
-
-	private final class ProtectedCancellationResponse implements CancellationResponse {
-
-		@Override
-		public void cancellationRequested() {
-			Promise.this.cancellationRequested();
 		}
 	}
 }
