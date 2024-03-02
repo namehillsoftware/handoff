@@ -31,7 +31,7 @@ final class Resolutions {
 			if (errorHandler.isRejected()) return;
 
 			final CollectedResultsResolver<Resolution> resolver = new CollectedResultsResolver<>(messenger, promises);
-			messenger.cancellation().must(new AggregateCancellation<>(messenger, promises, resolver));
+			messenger.promisedCancellation().must(new AggregateCancellation<>(messenger, promises, resolver));
 		}
 	}
 

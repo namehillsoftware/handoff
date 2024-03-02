@@ -18,7 +18,7 @@ public final class CancellationProxy extends CancellationToken implements Immedi
 	}
 
 	@Override
-	protected void cancellationRequested() {
+	public void cancellationRequested() {
 		super.cancellationRequested();
 		Promise<?> cancellingPromise;
 		while ((cancellingPromise = cancellablePromises.poll()) != null)

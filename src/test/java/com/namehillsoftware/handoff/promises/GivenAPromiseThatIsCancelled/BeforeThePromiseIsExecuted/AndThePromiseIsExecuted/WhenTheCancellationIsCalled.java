@@ -18,7 +18,7 @@ public class WhenTheCancellationIsCalled {
 		final ExternallyResolvableOperator<String> resolvableTask = new ExternallyResolvableOperator<>();
 		final Promise<String> promise = new Promise<>(resolvableTask);
 
-		final Promise<Object> cancellablePromise = promise.eventually((result) -> new Promise<>(messenger -> messenger.cancellation().must(() -> messenger.sendRejection(thrownException))));
+		final Promise<Object> cancellablePromise = promise.eventually((result) -> new Promise<>(messenger -> messenger.promisedCancellation().must(() -> messenger.sendRejection(thrownException))));
 
 		cancellablePromise.excuse((exception) -> caughtException = exception);
 

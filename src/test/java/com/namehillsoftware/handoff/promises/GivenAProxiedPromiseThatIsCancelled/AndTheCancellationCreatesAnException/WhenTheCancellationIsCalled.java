@@ -23,7 +23,7 @@ public class WhenTheCancellationIsCalled {
 		public void sendRejection(Throwable error) {}
 
 		@Override
-		public CancellationToken cancellation() {
+		public CancellationToken promisedCancellation() {
 			return new CancellationToken();
 		}
 	};
@@ -32,7 +32,7 @@ public class WhenTheCancellationIsCalled {
 	@BeforeClass
 	public static void before() throws Throwable {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
-		final Promise<Object> promisedObject = new Promise<>((m) -> m.cancellation().then(c -> {
+		final Promise<Object> promisedObject = new Promise<>((m) -> m.promisedCancellation().then(c -> {
 			m.sendRejection(new Exception());
 			return null;
 		}));

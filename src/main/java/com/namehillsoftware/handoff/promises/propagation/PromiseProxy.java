@@ -13,7 +13,7 @@ public final class PromiseProxy<Resolution> {
 	public PromiseProxy(Messenger<Resolution> messenger) {
 		resolutionProxy = new ResolutionProxy<>(messenger);
 		rejectionProxy = new RejectionProxy(messenger);
-		messenger.cancellation().must(cancellationProxy);
+		messenger.promisedCancellation().must(cancellationProxy);
 	}
 
 	public void proxy(Promise<Resolution> promise) {

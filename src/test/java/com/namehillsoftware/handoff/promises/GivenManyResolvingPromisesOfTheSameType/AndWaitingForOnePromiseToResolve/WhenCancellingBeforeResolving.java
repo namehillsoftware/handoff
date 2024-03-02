@@ -23,7 +23,7 @@ public class WhenCancellingBeforeResolving {
 
 		final Promise<String> firstPromise = new Promise<>(messenger -> {
 			messengers.add(messenger);
-			messenger.cancellation().must(() -> messenger.sendRejection(new Exception()));
+			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
 		});
 
 		firstPromise.excuse(e -> {
@@ -33,7 +33,7 @@ public class WhenCancellingBeforeResolving {
 
 		final Promise<String> secondPromise = new Promise<>(messenger -> {
 			messengers.add(messenger);
-			messenger.cancellation().must(() -> messenger.sendRejection(new Exception()));
+			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
 		});
 
 		secondPromise.excuse(e -> {
@@ -43,7 +43,7 @@ public class WhenCancellingBeforeResolving {
 
 		final Promise<String> thirdPromise = new Promise<>(messenger -> {
 			messengers.add(messenger);
-			messenger.cancellation().must(() -> messenger.sendRejection(new Exception()));
+			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
 		});
 
 		thirdPromise.excuse(e -> {
@@ -53,7 +53,7 @@ public class WhenCancellingBeforeResolving {
 
 		final Promise<String> fourthPromise = new Promise<>(messenger -> {
 			messengers.add(messenger);
-			messenger.cancellation().must(() -> messenger.sendRejection(new Exception()));
+			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
 		});
 
 		fourthPromise.excuse(e -> {

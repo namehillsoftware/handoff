@@ -11,11 +11,10 @@ extends
 implements
 	RespondingMessenger<Resolution> {
 
-	private CancellationToken cancellationToken;
+	private final CancellationToken cancellationToken = new CancellationToken();
 
-	@Override
-	protected final void initialize(CancellationToken cancellationToken) {
-		this.cancellationToken = cancellationToken;
+	ImmediatelyRespondingMessenger() {
+		awaitCancellation(cancellationToken);
 	}
 
 	@Override

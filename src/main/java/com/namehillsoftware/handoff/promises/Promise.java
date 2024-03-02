@@ -3,6 +3,7 @@ package com.namehillsoftware.handoff.promises;
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
+import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.cancellation.CancellationToken;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
@@ -12,30 +13,20 @@ import java.util.Collection;
 
 public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
-	private final CancellationToken cancellationToken;
-
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
-		this();
 		messengerOperator.send(new PromiseMessenger());
 	}
 
 	public Promise(Resolution passThroughResult) {
-		this();
 		resolve(passThroughResult);
 	}
 
 	public Promise(Throwable rejection) {
-		this();
 		reject(rejection);
 	}
 
-	public Promise() {
-		this(new CancellationToken());
-	}
-
-	protected Promise(CancellationToken cancellationToken) {
-		this.cancellationToken = cancellationToken;
-		initialize(cancellationToken);
+	protected Promise() {
+		awaitCancellation(new ProtectedCancellationResponse());
 	}
 
 	private <NewResolution, PromisedResolution extends Promise<NewResolution> & RespondingMessenger<Resolution>> PromisedResolution then(PromisedResolution onFulfilled) {
@@ -90,16 +81,6 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		return promisedEventualAction;
 	}
 
-	@Override
-	protected final void respondToCancellation() {
-		if (cancellationToken != null)
-			cancellationToken.cancel();
-
-		cancellationRequested();
-	}
-
-	protected void initialize(CancellationToken cancellationToken) {}
-
 	protected void cancellationRequested() {}
 
 	@SuppressWarnings("unchecked")
@@ -138,6 +119,12 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	private class PromiseMessenger implements Messenger<Resolution> {
 
+		private final CancellationToken cancellationToken = new CancellationToken();
+
+		public PromiseMessenger() {
+			Promise.this.awaitCancellation(cancellationToken);
+		}
+
 		@Override
 		public void sendResolution(Resolution resolution) {
 			resolve(resolution);
@@ -149,8 +136,16 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		}
 
 		@Override
-		public CancellationToken cancellation() {
+		public CancellationToken promisedCancellation() {
 			return cancellationToken;
+		}
+	}
+
+	private class ProtectedCancellationResponse implements CancellationResponse {
+
+		@Override
+		public void cancellationRequested() {
+			Promise.this.cancellationRequested();
 		}
 	}
 }
