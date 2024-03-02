@@ -16,15 +16,33 @@ repositories {
 	}
 }
 
-def versionDetails = versionDetails()
-version = versionDetails.lastTag
+def isRelease = true
+
 // .dockerignore and .gitignore may differ, which can lead to a clean branch looking dirty,
 // so use this custom algorithm for version snapshot/not-snapshot detection
-def isRelease = true
-if (versionDetails.commitDistance > 0 || versionDetails.branchName != 'master') {
-	version += "+$versionDetails.branchName-$versionDetails.commitDistance-SNAPSHOT"
-	isRelease = false
-}
+version = {
+	try {
+		def gitDescribe = providers.exec {
+			it.ignoreExitValue = true
+			commandLine("git", "describe")
+		}.standardOutput.asText.get().trim()
+
+		def latestTag = providers.exec {
+			it.ignoreExitValue = true
+			commandLine("git", "describe", "--abbrev=0")
+		}.standardOutput.asText.get().trim()
+
+		if (gitDescribe != latestTag) {
+			isRelease = false
+			return latestTag + "-SNAPSHOT"
+		}
+
+		isRelease = true
+		return gitDescribe
+	} catch (ignored) {
+		return "0.0.1"
+	}
+}()
 
 group = "com.namehillsoftware"
 archivesBaseName = "handoff"
