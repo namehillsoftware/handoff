@@ -14,11 +14,7 @@ import java.util.Collection;
 public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
-		this(null, messengerOperator);
-	}
-
-	public Promise(CancellationResponse cancellationResponse, MessengerOperator<Resolution> messengerOperator) {
-		final PromiseMessenger messenger = new PromiseMessenger(cancellationResponse);
+		final PromiseMessenger messenger = new PromiseMessenger();
 		awaitCancellation(messenger);
 		messengerOperator.send(messenger);
 	}
@@ -121,35 +117,20 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		private static final Promise emptyPromiseInstance = new Promise<>((Object) null);
 	}
 
-	private final class PromiseMessenger implements Messenger<Resolution>, CancellationResponse {
-
-		private final CancellationToken cancellationToken = new CancellationToken();
-		private final CancellationResponse cancellationResponse;
-
-		public PromiseMessenger(CancellationResponse cancellationResponse) {
-			this.cancellationResponse = cancellationResponse;
-		}
-
+	private final class PromiseMessenger extends CancellationToken implements Messenger<Resolution>, CancellationResponse {
 		@Override
 		public void sendResolution(Resolution resolution) {
-			resolve(resolution);
+			Promise.this.resolve(resolution);
 		}
 
 		@Override
 		public void sendRejection(Throwable error) {
-			reject(error);
+			Promise.this.reject(error);
 		}
 
 		@Override
 		public CancellationToken promisedCancellation() {
-			return cancellationToken;
-		}
-
-		@Override
-		public void cancellationRequested() {
-			cancellationToken.cancel();
-			if (cancellationResponse != null)
-				cancellationResponse.cancellationRequested();
+			return this;
 		}
 	}
 }
