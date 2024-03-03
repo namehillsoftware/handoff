@@ -7,11 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CancellationToken extends Promise<Void> implements CancellationSignal, Cancellable, CancellationResponse {
 
+	private final AtomicBoolean isCancelled = new AtomicBoolean();
+
 	public CancellationToken() {
 		awaitCancellation(this);
 	}
-
-	private final AtomicBoolean isCancelled = new AtomicBoolean();
 
 	public final boolean isCancelled() {
 		return isCancelled.get();

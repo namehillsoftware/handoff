@@ -1,6 +1,5 @@
 package com.namehillsoftware.handoff.promises;
 
-import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 
 final class ImmediateActionResponse<Resolution> extends ImmediatelyRespondingMessenger<Resolution, Resolution> {
@@ -12,13 +11,13 @@ final class ImmediateActionResponse<Resolution> extends ImmediatelyRespondingMes
     }
 
     @Override
-    protected void respond(Resolution resolution, CancellationSignal cancellationSignal) throws Throwable {
+    protected void respond(Resolution resolution) throws Throwable {
         response.act();
         resolve(resolution);
     }
 
     @Override
-    protected void respond(Throwable reason, CancellationSignal cancellationSignal) throws Throwable {
+    protected void respond(Throwable reason) throws Throwable {
         response.act();
         reject(reason);
     }

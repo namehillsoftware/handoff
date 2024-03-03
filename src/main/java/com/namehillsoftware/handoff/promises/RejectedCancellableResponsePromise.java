@@ -4,7 +4,7 @@ import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.promises.response.ImmediateCancellableResponse;
 
 final class RejectedCancellableResponsePromise<Resolution, Response>
-	extends ImmediatelyRespondingMessenger<Resolution, Response> {
+	extends ImmediatelyRespondingCancellableMessenger<Resolution, Response> {
 	private final ImmediateCancellableResponse<Throwable, Response> onFulfilled;
 
 	RejectedCancellableResponsePromise(ImmediateCancellableResponse<Throwable, Response> onRejected) {

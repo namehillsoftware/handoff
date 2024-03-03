@@ -3,7 +3,7 @@ package com.namehillsoftware.handoff.promises;
 import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.promises.response.ImmediateCancellableResponse;
 
-class PromiseImmediateCancellableResponse<Resolution, Response> extends ImmediatelyRespondingMessenger<Resolution, Response> {
+class PromiseImmediateCancellableResponse<Resolution, Response> extends ImmediatelyRespondingCancellableMessenger<Resolution, Response> {
 
 	private final ImmediateCancellableResponse<Resolution, Response> onFulfilled;
 	private final ImmediateCancellableResponse<Throwable, Response> onRejected;

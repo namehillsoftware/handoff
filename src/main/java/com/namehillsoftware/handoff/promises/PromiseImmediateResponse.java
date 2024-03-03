@@ -1,6 +1,5 @@
 package com.namehillsoftware.handoff.promises;
 
-import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
 class PromiseImmediateResponse<Resolution, Response> extends ImmediatelyRespondingMessenger<Resolution, Response> {
@@ -20,12 +19,12 @@ class PromiseImmediateResponse<Resolution, Response> extends ImmediatelyRespondi
 	}
 
 	@Override
-	protected void respond(Resolution resolution, CancellationSignal cancellationSignal) throws Throwable {
+	protected void respond(Resolution resolution) throws Throwable {
 		resolve(onFulfilled.respond(resolution));
 	}
 
 	@Override
-	protected void respond(Throwable rejection, CancellationSignal cancellationSignal) throws Throwable {
+	protected void respond(Throwable rejection) throws Throwable {
 		if (onRejected != null)
 			resolve(onRejected.respond(rejection));
 		else
