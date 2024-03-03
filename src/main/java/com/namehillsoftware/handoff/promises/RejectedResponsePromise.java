@@ -1,11 +1,9 @@
 package com.namehillsoftware.handoff.promises;
 
-import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
+final class RejectedResponsePromise<Resolution, Response> extends ImmediatelyRespondingMessenger<Resolution, Response> {
+	private final com.namehillsoftware.handoff.promises.response.ImmediateResponse<Throwable, Response> onFulfilled;
 
-final class RejectedResponsePromise<Resolution, Response> extends PromiseResponse<Resolution, Response> {
-	private final ImmediateResponse<Throwable, Response> onFulfilled;
-
-	RejectedResponsePromise(ImmediateResponse<Throwable, Response> onRejected) {
+	RejectedResponsePromise(com.namehillsoftware.handoff.promises.response.ImmediateResponse<Throwable, Response> onRejected) {
 		this.onFulfilled = onRejected;
 	}
 

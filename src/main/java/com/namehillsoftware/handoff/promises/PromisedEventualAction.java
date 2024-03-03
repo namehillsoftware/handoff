@@ -17,9 +17,8 @@ implements
 	private final EventualAction onFulfilled;
 
 	PromisedEventualAction(EventualAction onFulfilled) {
+		awaitCancellation(cancellationProxy);
 		this.onFulfilled = onFulfilled;
-
-		respondToCancellation(cancellationProxy);
 	}
 
 	@Override

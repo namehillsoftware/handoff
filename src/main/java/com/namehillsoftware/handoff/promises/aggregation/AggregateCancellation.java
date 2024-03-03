@@ -3,11 +3,12 @@ package com.namehillsoftware.handoff.promises.aggregation;
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.errors.AggregateCancellationException;
 import com.namehillsoftware.handoff.promises.Promise;
+import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class AggregateCancellation<TResult> implements Runnable {
+public class AggregateCancellation<TResult> implements ImmediateAction {
 
 	private final Messenger<Collection<TResult>> collectionMessenger;
 	private final Collection<Promise<TResult>> promises;
@@ -20,7 +21,7 @@ public class AggregateCancellation<TResult> implements Runnable {
 	}
 
 	@Override
-	public void run() {
+	public void act() {
 		for (Promise<?> promise : promises) promise.cancel();
 
 		collectionMessenger.sendRejection(new AggregateCancellationException(new ArrayList<>(resultCollector.getResults())));

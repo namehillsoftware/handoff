@@ -2,7 +2,7 @@ package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
-class PromiseImmediateResponse<Resolution, Response> extends PromiseResponse<Resolution, Response> {
+class PromiseImmediateResponse<Resolution, Response> extends ImmediatelyRespondingMessenger<Resolution, Response> {
 
 	private final ImmediateResponse<Resolution, Response> onFulfilled;
 	private final ImmediateResponse<Throwable, Response> onRejected;

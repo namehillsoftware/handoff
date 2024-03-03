@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves.AndContinuingWithResponseAndRejection.AndTheRejectionThrowsAnError;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,24 +11,31 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class WhenAnotherReturningPromiseIsExpected {
 
-	private Integer nextReturningPromiseResult;
-	private boolean isCalled;
+	private static Integer nextReturningPromiseResult;
+	private static boolean isErrorCalled;
 
-	private static final Exception thrownException = new Exception();
+	private static boolean isCancelled;
+
 	private static Throwable caughtException;
 
-	@Before
-	public void before() {
+	@BeforeClass
+	public static void before() {
 		new Promise<>("test")
-				.<Integer>then(result -> {
+				.<Integer>then((result, cancellationSignal) -> {
+					isCancelled = cancellationSignal.isCancelled();
 					nextReturningPromiseResult = 330 + result.hashCode();
 					throw new Exception();
-				}, err -> {
+				}, (err, cancellationSignal) -> {
 					caughtException = err;
 					throw new Exception();
 				})
 				.then(nextResult -> nextReturningPromiseResult = nextResult)
-				.excuse(err -> isCalled = true);
+				.excuse(err -> isErrorCalled = true);
+	}
+
+	@Test
+	public void thenTheResponseIsNotCancelled() {
+		assertThat(isCancelled).isFalse();
 	}
 
 	@Test
@@ -43,6 +50,6 @@ public class WhenAnotherReturningPromiseIsExpected {
 
 	@Test
 	public void thenTheErrorIsCalled() {
-		assertThat(isCalled).isTrue();
+		assertThat(isErrorCalled).isTrue();
 	}
 }

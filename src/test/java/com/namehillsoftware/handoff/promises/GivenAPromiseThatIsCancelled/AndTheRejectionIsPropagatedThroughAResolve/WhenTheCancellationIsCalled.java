@@ -15,7 +15,7 @@ public class WhenTheCancellationIsCalled {
 
 	@Before
 	public void before() {
-		new Promise<String>((messenger) -> messenger.cancellationRequested(() -> messenger.sendRejection(new Exception())))
+		new Promise<String>((messenger) -> messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception())))
 			.then((result) -> null)
 			.excuse((exception) -> caughtException = exception)
 			.cancel();
