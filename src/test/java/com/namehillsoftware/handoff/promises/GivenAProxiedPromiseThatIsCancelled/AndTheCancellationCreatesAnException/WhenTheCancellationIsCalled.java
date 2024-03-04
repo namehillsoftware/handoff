@@ -1,6 +1,8 @@
 package com.namehillsoftware.handoff.promises.GivenAProxiedPromiseThatIsCancelled.AndTheCancellationCreatesAnException;
 
 import com.namehillsoftware.handoff.Messenger;
+import com.namehillsoftware.handoff.cancellation.CancellationSignal;
+import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
 import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.propagation.PromiseProxy;

@@ -1,10 +1,13 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsRejected;
 
+import com.namehillsoftware.handoff.StackTraceFilteredCondition;
+import com.namehillsoftware.handoff.errors.StackTraceFiltering;
 import com.namehillsoftware.handoff.promises.Promise;
+import org.assertj.core.api.Condition;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 public class WhenTheRejectionIsCalled {
 
