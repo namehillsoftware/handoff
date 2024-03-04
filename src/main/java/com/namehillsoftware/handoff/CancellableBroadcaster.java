@@ -2,15 +2,19 @@ package com.namehillsoftware.handoff;
 
 import com.namehillsoftware.handoff.cancellation.Cancellable;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
+import com.namehillsoftware.handoff.errors.StackTraceFiltering;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 abstract class CancellableBroadcaster<Resolution> implements Cancellable {
+
 	private final AtomicReference<CancellationResponse> reaction = new AtomicReference<>();
     private final AtomicBoolean isCancellationClosed = new AtomicBoolean();
 
     protected final void reject(Throwable error) {
+		StackTraceFiltering.filterStackTrace(error);
         closeCancellationAndResolve(null, error);
     }
 
