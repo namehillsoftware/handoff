@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsRejected.AndContinuingWithResponseAndRejection.AndTheRejectionThrowsAnError;
 
 import com.namehillsoftware.handoff.StackTraceFilteredCondition;
-import com.namehillsoftware.handoff.errors.StackTraceFiltering;
+import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.promises.Promise;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class WhenAnotherReturningPromiseIsExpected {
 
 	@Before
 	public void before() {
-		StackTraceFiltering.toggleStackTraceFiltering(true);
+		HandoffStackTraceFiltering.toggleStackTraceFiltering(true);
 		new Promise<>(thrownException)
 				.then(result -> 330 + result.hashCode(), err -> {
 					caughtException = err;
@@ -31,7 +31,7 @@ public class WhenAnotherReturningPromiseIsExpected {
 					finalException = err;
 					return null;
 				})
-				.must(() -> StackTraceFiltering.toggleStackTraceFiltering(false));
+				.must(() -> HandoffStackTraceFiltering.toggleStackTraceFiltering(false));
 	}
 
 	@Test

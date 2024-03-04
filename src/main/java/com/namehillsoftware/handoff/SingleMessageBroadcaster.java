@@ -1,5 +1,6 @@
 package com.namehillsoftware.handoff;
 
+import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
 
 import java.util.Collections;
@@ -40,7 +41,14 @@ public abstract class SingleMessageBroadcaster<Resolution> extends CancellableBr
 
 	@Override
 	protected final void resolve(Resolution resolution, Throwable rejection) {
-		atomicMessage.compareAndSet(null, new Message<>(resolution, rejection));
+		final boolean isRejected = atomicMessage.compareAndSet(null, new Message<>(resolution, rejection)) && rejection != null;
+
+		if (!isRejected) {
+			dispatchMessage(atomicMessage.get());
+			return;
+		}
+
+		HandoffStackTraceFiltering.filterStackTrace(rejection);
 		dispatchMessage(atomicMessage.get());
 	}
 
