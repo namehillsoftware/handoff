@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAProxiedPromiseThatIsCancelled.AndTheCancellationCreatesAnException;
 
 import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.cancellation.CancellationToken;
+import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.propagation.PromiseProxy;
 import org.junit.BeforeClass;
@@ -16,15 +16,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class WhenTheCancellationIsCalled {
 
 	private static final Messenger<Object> messenger = new Messenger<Object>() {
+
+		@Override
+		public boolean isCancelled() {
+			return token.isCancelled();
+		}
+
+		private final PromisedCancellationToken token = new PromisedCancellationToken();
+
 		@Override
 		public void sendResolution(Object tResult) {}
 
 		@Override
 		public void sendRejection(Throwable error) {}
-
 		@Override
-		public CancellationToken promisedCancellation() {
-			return new CancellationToken();
+		public Promise<Void> promisedCancellation() {
+			return token.promisedCancellation();
 		}
 	};
 	private static boolean unhandledRejection;

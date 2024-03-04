@@ -13,7 +13,7 @@ public class WhenRunning {
 
 	@BeforeClass
 	public static void before() {
-		cancellationToken.cancel();
+		cancellationToken.cancellationRequested();
 	}
 
 	@Test
