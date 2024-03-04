@@ -39,20 +39,16 @@ version = {
 
 		isRelease = true
 		return gitDescribe
-	} catch (ignored) {
+	} catch (e) {
+		logger.error("An error occurred determining version", e)
 		return "0.0.1"
 	}
 }()
 
+println "Version: $version"
+
 group = "com.namehillsoftware"
 archivesBaseName = "handoff"
-
-jacocoTestReport {
-    reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
-        html.enabled = true
-    }
-}
 
 java {
 	withJavadocJar()
