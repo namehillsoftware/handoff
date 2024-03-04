@@ -4,7 +4,7 @@
 # This magic is taken from this stack overflow answer - https://stackoverflow.com/a/34329799/1189542.
 BUILD_ID="$(od  -vN "8" -An -tx1  /dev/urandom | tr -d " \n")"
 
-docker-compose build && docker-compose run --name "${BUILD_ID}" gradle \
+docker compose build && docker compose run --name "${BUILD_ID}" gradle \
   publishToSonatype \
   closeAndReleaseSonatypeStagingRepository
 EXIT_CODE=${PIPESTATUS[0]}

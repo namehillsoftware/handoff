@@ -4,7 +4,7 @@ import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
-import com.namehillsoftware.handoff.cancellation.CancellationToken;
+import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
 
@@ -117,20 +117,15 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		private static final Promise emptyPromiseInstance = new Promise<>((Object) null);
 	}
 
-	private final class PromiseMessenger extends CancellationToken implements Messenger<Resolution>, CancellationResponse {
+	private final class PromiseMessenger extends PromisedCancellationToken implements Messenger<Resolution>, CancellationResponse {
 		@Override
 		public void sendResolution(Resolution resolution) {
-			Promise.this.resolve(resolution);
+			resolve(resolution);
 		}
 
 		@Override
 		public void sendRejection(Throwable error) {
-			Promise.this.reject(error);
-		}
-
-		@Override
-		public CancellationToken promisedCancellation() {
-			return this;
+			reject(error);
 		}
 	}
 }

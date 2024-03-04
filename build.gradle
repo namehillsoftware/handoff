@@ -90,24 +90,20 @@ def signingPassword = findProperty("signingPassword")
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
+			groupId = "com.namehillsoftware"
 			artifactId = 'handoff'
+			version = version
+
 			from components.java
-			versionMapping {
-				usage('java-api') {
-					fromResolutionOf('runtimeClasspath')
-				}
-				usage('java-runtime') {
-					fromResolutionResult()
-				}
-			}
+
 			pom {
 				name = 'handoff'
 				description = 'A concise description of my library'
 				url = 'https://github.com/namehillsoftware/handoff'
 				licenses {
 					license {
-						name = "The Apache Software License, Version 2.0"
-						url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						name = "MIT License"
+						url = "https://spdx.org/licenses/MIT.html"
 					}
 				}
 				developers {

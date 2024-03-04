@@ -13,7 +13,7 @@ public final class CancellablePreparedMessengerOperator<Result> implements Messe
 	@Override
 	public void send(Messenger<Result> messenger) {
 		try {
-			messenger.sendResolution(writer.prepareMessage(messenger.promisedCancellation()));
+			messenger.sendResolution(writer.prepareMessage(messenger));
 		} catch (Throwable throwable) {
 			messenger.sendRejection(throwable);
 		}
