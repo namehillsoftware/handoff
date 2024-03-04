@@ -4,7 +4,6 @@ import com.namehillsoftware.handoff.cancellation.Cancellable;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.errors.StackTraceFiltering;
 
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
