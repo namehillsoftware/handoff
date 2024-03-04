@@ -1,4 +1,4 @@
-FROM gradle:7.1.1-jdk11
+FROM gradle:8.6.0-jdk11
 
 WORKDIR /src
 
