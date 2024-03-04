@@ -22,42 +22,50 @@ public final class StackTraceFiltering {
 		final StackTraceElement[] stackTraceElements = error.getStackTrace();
 		final ArrayList<StackTraceElement> reducedStackTraceElements = new ArrayList<>(stackTraceElements.length);
 
-		final ArrayList<StackTraceElement> omittedStackTraceElements = new ArrayList<>();
+		StackTraceElement firstOmittedStackTraceElement = null;
+		StackTraceElement lastOmittedStackTraceElement = null;
+		int omittedStackTraceElementCount = 0;
 		for (StackTraceElement element : stackTraceElements) {
-			if (element.getClassName().startsWith(packageName)) {
-				omittedStackTraceElements.add(element);
+			if (!element.getClassName().startsWith(packageName)) {
+				fillInOmittedElements(firstOmittedStackTraceElement, lastOmittedStackTraceElement, omittedStackTraceElementCount, reducedStackTraceElements);
+				firstOmittedStackTraceElement = null;
+				lastOmittedStackTraceElement = null;
+				omittedStackTraceElementCount = 0;
+
+				reducedStackTraceElements.add(element);
 				continue;
 			}
 
-			fillInOmittedElements(omittedStackTraceElements, reducedStackTraceElements);
-			reducedStackTraceElements.add(element);
+			++omittedStackTraceElementCount;
+
+			if (firstOmittedStackTraceElement == null) {
+				firstOmittedStackTraceElement = element;
+				continue;
+			}
+
+			lastOmittedStackTraceElement = element;
 		}
 
-		fillInOmittedElements(omittedStackTraceElements, reducedStackTraceElements);
+		fillInOmittedElements(firstOmittedStackTraceElement, lastOmittedStackTraceElement, omittedStackTraceElementCount, reducedStackTraceElements);
 
 		final StackTraceElement[] newStackTrace = new StackTraceElement[reducedStackTraceElements.size()];
 		error.setStackTrace(reducedStackTraceElements.toArray(newStackTrace));
 	}
 
-	private static void fillInOmittedElements(ArrayList<StackTraceElement> omittedStackTraceElements, ArrayList<StackTraceElement> reducedStackTraceElements) {
-		final int omittedStackTraceElementsSize = omittedStackTraceElements.size();
-		if (omittedStackTraceElementsSize > 0) {
-			reducedStackTraceElements.add(omittedStackTraceElements.get(0));
+	private static void fillInOmittedElements(StackTraceElement firstOmittedStackTraceElement, StackTraceElement lastOmittedStackTraceElement, int omittedStackTraceElementsSize, ArrayList<StackTraceElement> reducedStackTraceElements) {
+		if (firstOmittedStackTraceElement != null)
+			reducedStackTraceElements.add(firstOmittedStackTraceElement);
 
-			if (omittedStackTraceElementsSize > 2) {
-				reducedStackTraceElements.add(
-					new StackTraceElement(
-						omittedStackTraceElementsSize - 2 + omittedStackTrace,
-						"",
-						"",
-						0));
-			}
-
-			if (omittedStackTraceElementsSize > 1) {
-				reducedStackTraceElements.add(omittedStackTraceElements.get(omittedStackTraceElementsSize - 1));
-			}
-
-			omittedStackTraceElements.clear();
+		if (omittedStackTraceElementsSize > 2) {
+			reducedStackTraceElements.add(
+				new StackTraceElement(
+					omittedStackTraceElementsSize - 2 + omittedStackTrace,
+					"",
+					"",
+					0));
 		}
+
+		if (lastOmittedStackTraceElement != null)
+			reducedStackTraceElements.add(lastOmittedStackTraceElement);
 	}
 }
