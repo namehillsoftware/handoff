@@ -8,7 +8,7 @@ public final class StackTraceFiltering {
 
 	// Use a module in the root namespace
 	private static final String packageName = Messenger.class.getPackage().getName();
-	private static final String omittedStackTrace = "handoff frames omitted from stack trace";
+	private static final String omittedStackTrace = " handoff frames omitted from stack trace";
 
 	private static boolean isStackTraceFilteringEnabled;
 
@@ -45,7 +45,12 @@ public final class StackTraceFiltering {
 			reducedStackTraceElements.add(omittedStackTraceElements.get(0));
 
 			if (omittedStackTraceElementsSize > 2) {
-				reducedStackTraceElements.add(new StackTraceElement(omittedStackTrace, "", "", 0));
+				reducedStackTraceElements.add(
+					new StackTraceElement(
+						omittedStackTraceElementsSize - 2 + omittedStackTrace,
+						"",
+						"",
+						0));
 			}
 
 			if (omittedStackTraceElementsSize > 1) {

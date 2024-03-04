@@ -1,4 +1,4 @@
-package com.namehillsoftware.handoff.errors.GivenAStackTrace.AndStackTraceFilteringIsEnabled.AndItContainsMoreThanThreeHandoffElements;
+package com.namehillsoftware.handoff.errors.GivenAStackTrace.AndStackTraceFilteringIsEnabled.AndItContainsThreeHandoffElements;
 
 import com.namehillsoftware.handoff.StackTraceFilteredCondition;
 import com.namehillsoftware.handoff.errors.StackTraceFiltering;
@@ -14,7 +14,7 @@ public class WhenFilteringTheStackTrace {
 	public static void act() {
 		StackTraceFiltering.toggleStackTraceFiltering(true);
 		final Throwable exception = new Throwable("error");
-		final StackTraceElement[] stackTraceElements = new StackTraceElement[4];
+		final StackTraceElement[] stackTraceElements = new StackTraceElement[3];
 		stackTraceElements[0] = new StackTraceElement(
 			StackTraceFilteredCondition.class.getName(),
 			"testMethod",
@@ -24,17 +24,12 @@ public class WhenFilteringTheStackTrace {
 			WhenFilteringTheStackTrace.class.getName(),
 			"testMethodTwo",
 			"QURPG9Ag.java",
-			801);
+			201);
 		stackTraceElements[2] = new StackTraceElement(
 			WhenFilteringTheStackTrace.class.getName(),
 			"testMethodTwo",
 			"QURPG9Ag.java",
-			584);
-		stackTraceElements[3] = new StackTraceElement(
-			WhenFilteringTheStackTrace.class.getName(),
-			"p3YPFqrn0Q",
-			"qtEzfCbrO.java",
-			257);
+			201);
 		exception.setStackTrace(stackTraceElements);
 		StackTraceFiltering.filterStackTrace(exception);
 		filteredException = exception;
@@ -50,15 +45,15 @@ public class WhenFilteringTheStackTrace {
 				"Test.java",
 				280),
 			new StackTraceElement(
-				"2 handoff frames omitted from stack trace",
+				"1 handoff frames omitted from stack trace",
 				"",
 				"",
 				0),
 			new StackTraceElement(
 				WhenFilteringTheStackTrace.class.getName(),
-				"p3YPFqrn0Q",
-				"qtEzfCbrO.java",
-				257)
+				"testMethodTwo",
+				"QURPG9Ag.java",
+				201)
 		);
 	}
 }
