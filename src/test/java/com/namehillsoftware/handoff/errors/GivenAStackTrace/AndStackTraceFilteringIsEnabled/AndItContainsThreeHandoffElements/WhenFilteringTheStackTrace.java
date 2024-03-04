@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.errors.GivenAStackTrace.AndStackTraceFilteringIsEnabled.AndItContainsThreeHandoffElements;
 
 import com.namehillsoftware.handoff.StackTraceFilteredCondition;
-import com.namehillsoftware.handoff.errors.StackTraceFiltering;
+import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ public class WhenFilteringTheStackTrace {
 
 	@BeforeClass
 	public static void act() {
-		StackTraceFiltering.toggleStackTraceFiltering(true);
+		HandoffStackTraceFiltering.toggleStackTraceFiltering(true);
 		final Throwable exception = new Throwable("error");
 		final StackTraceElement[] stackTraceElements = new StackTraceElement[3];
 		stackTraceElements[0] = new StackTraceElement(
@@ -31,9 +31,9 @@ public class WhenFilteringTheStackTrace {
 			"QURPG9Ag.java",
 			201);
 		exception.setStackTrace(stackTraceElements);
-		StackTraceFiltering.filterStackTrace(exception);
+		HandoffStackTraceFiltering.filterStackTrace(exception);
 		filteredException = exception;
-		StackTraceFiltering.toggleStackTraceFiltering(false);
+		HandoffStackTraceFiltering.toggleStackTraceFiltering(false);
 	}
 
 	@Test

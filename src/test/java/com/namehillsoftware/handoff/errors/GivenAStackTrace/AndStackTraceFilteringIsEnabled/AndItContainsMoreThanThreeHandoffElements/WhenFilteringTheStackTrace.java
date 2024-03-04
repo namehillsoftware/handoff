@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.errors.GivenAStackTrace.AndStackTraceFilteringIsEnabled.AndItContainsMoreThanThreeHandoffElements;
 
 import com.namehillsoftware.handoff.StackTraceFilteredCondition;
-import com.namehillsoftware.handoff.errors.StackTraceFiltering;
+import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.promises.Promise;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class WhenFilteringTheStackTrace {
 
 	@BeforeClass
 	public static void act() {
-		StackTraceFiltering.toggleStackTraceFiltering(true);
+		HandoffStackTraceFiltering.toggleStackTraceFiltering(true);
 		final Throwable exception = new Throwable("error");
 		final ArrayList<StackTraceElement> stackTraceElements = new ArrayList<>();
 		stackTraceElements.add(new StackTraceElement(
@@ -76,9 +76,9 @@ public class WhenFilteringTheStackTrace {
 
 		final StackTraceElement[] stackTrace = new StackTraceElement[stackTraceElements.size()];
 		exception.setStackTrace(stackTraceElements.toArray(stackTrace));
-		StackTraceFiltering.filterStackTrace(exception);
+		HandoffStackTraceFiltering.filterStackTrace(exception);
 		filteredException = exception;
-		StackTraceFiltering.toggleStackTraceFiltering(false);
+		HandoffStackTraceFiltering.toggleStackTraceFiltering(false);
 	}
 
 	@Test

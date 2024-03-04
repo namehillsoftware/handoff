@@ -5,6 +5,7 @@ import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
+import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
 
@@ -109,6 +110,10 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 	public static final class Rejections {
 		public static void setUnhandledRejectionsReceiver(UnhandledRejectionsReceiver receiver) {
 			SingleMessageBroadcaster.setUnhandledRejectionsReceiver(receiver);
+		}
+
+		public static void toggleStackTraceFiltering(boolean enabled) {
+			HandoffStackTraceFiltering.toggleStackTraceFiltering(enabled);
 		}
 	}
 

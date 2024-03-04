@@ -4,7 +4,7 @@ import com.namehillsoftware.handoff.Messenger;
 
 import java.util.ArrayList;
 
-public final class StackTraceFiltering {
+public final class HandoffStackTraceFiltering {
 
 	// Use a module in the root namespace
 	private static final String packageName = Messenger.class.getPackage().getName();
