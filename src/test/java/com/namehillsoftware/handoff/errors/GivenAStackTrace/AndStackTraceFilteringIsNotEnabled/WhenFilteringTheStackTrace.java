@@ -1,4 +1,4 @@
-package com.namehillsoftware.handoff.errors.GivenAStackTrace.AndStackTraceFilteringIsEnabled.AndItContainsMoreThanThreeHandoffElements;
+package com.namehillsoftware.handoff.errors.GivenAStackTrace.AndStackTraceFilteringIsNotEnabled;
 
 import com.namehillsoftware.handoff.StackTraceFilteredCondition;
 import com.namehillsoftware.handoff.errors.StackTraceFiltering;
@@ -15,7 +15,7 @@ public class WhenFilteringTheStackTrace {
 
 	@BeforeClass
 	public static void act() {
-		StackTraceFiltering.toggleStackTraceFiltering(true);
+		StackTraceFiltering.toggleStackTraceFiltering(false);
 		final Throwable exception = new Throwable("error");
 		final ArrayList<StackTraceElement> stackTraceElements = new ArrayList<>();
 		stackTraceElements.add(new StackTraceElement(
@@ -100,10 +100,15 @@ public class WhenFilteringTheStackTrace {
 				"Test.java",
 				280),
 			new StackTraceElement(
-				"2 handoff frames omitted from stack trace",
-				"",
-				"",
-				0),
+				WhenFilteringTheStackTrace.class.getName(),
+				"testMethodTwo",
+				"QURPG9Ag.java",
+				801),
+			new StackTraceElement(
+				WhenFilteringTheStackTrace.class.getName(),
+				"testMethodTwo",
+				"QURPG9Ag.java",
+				584),
 			new StackTraceElement(
 				WhenFilteringTheStackTrace.class.getName(),
 				"p3YPFqrn0Q",
