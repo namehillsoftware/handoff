@@ -7,7 +7,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,25 +16,25 @@ public class WhenCancellingTheResponse {
 	private static boolean isCancelled;
 
 	@BeforeClass
-	public static void before() {
-		final CountDownLatch countDownLatch = new CountDownLatch(2);
-
+	public static void before() throws InterruptedException {
+		// Use latches to ensure correct order of execution.
+		final CountDownLatch cancellationLatch = new CountDownLatch(1);
+		final CountDownLatch resultLatch = new CountDownLatch(1);
 		final Promise<String> response = new QueuedPromise<>(() -> {
-			countDownLatch.await(30, TimeUnit.SECONDS);
+			cancellationLatch.await();
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)
 			.then((nextResult, cancellationSignal) -> {
-				countDownLatch.await(30, TimeUnit.SECONDS);
 				isCancelled = cancellationSignal.isCancelled();
-				return nextReturningPromiseResult = nextResult;
+				nextReturningPromiseResult = nextResult;
+				resultLatch.countDown();
+				return nextResult;
 			});
 
-		// Use a count-down latch to ensure the continuation runs on the executor thread (to avoid deadlocks)
-		countDownLatch.countDown();
-
 		response.cancel();
+		cancellationLatch.countDown();
 
-		countDownLatch.countDown();
+		resultLatch.await();
 	}
 
 	@Test
