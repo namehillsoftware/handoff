@@ -262,3 +262,38 @@ playlist.promiseFirstFile()
         return null;
     });
 ```
+
+### Cancellation
+
+All promises implement `Cancellable`. When `cancel()` is called on a promise, it sends a cancellation message to the
+`CancellationResponse` passed into `awaitCancellation(...)`. The `CancellationResponse` can be changed anytime before the
+promise is resolved or rejected.
+
+```java
+// Implement a CancellationResponse as well, and assign it in the constructor.
+class PromisedResponse extends Promise<String> implements Callback, CancellationResponse {
+    
+    private final Call call;
+    
+    public PromisedResponse(Call call) {
+        this.call = call;
+        awaitCancellation(this);
+        call.enqueue(this);
+    }
+
+    @Override
+    public void onFailure(Request request, IOException e) {
+        reject(e);
+    }
+
+    @Override
+    public void onResponse(Response response) throws IOException {
+        resolve(response.body().string());
+    }
+    
+    @Override
+    public void cancellationRequested() {
+        call.cancel();
+    }
+}
+```
