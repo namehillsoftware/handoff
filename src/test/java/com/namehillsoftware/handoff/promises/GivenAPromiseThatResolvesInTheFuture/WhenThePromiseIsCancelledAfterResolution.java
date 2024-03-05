@@ -38,10 +38,15 @@ public class WhenThePromiseIsCancelledAfterResolution {
 			});
 
 			cancellationRunnable = spy(new ThreadCanceller(myNewThread));
-			messenger.promisedCancellation().must(cancellationRunnable);
 
 			myNewThread.start();
-		});
+		}, () -> {
+            try {
+                cancellationRunnable.act();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        });
 
 		promise.then(r -> result = r);
 

@@ -1,24 +1,29 @@
 package com.namehillsoftware.handoff.promises.propagation;
 
+import com.namehillsoftware.handoff.cancellation.Cancellable;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
-public class ProxyingPromise<Resolution> extends Promise<Resolution> implements CancellationResponse {
+public class ProxyPromise<Resolution> extends Promise<Resolution> implements CancellationResponse {
 
 	private final CancellationProxy cancellationProxy = new CancellationProxy();
 
-	protected ProxyingPromise() {
+	protected ProxyPromise() {
 		awaitCancellation(this);
 	}
 
-	public void proxy(Promise<Resolution> promise) {
+	public final void proxy(Promise<Resolution> promise) {
 		try {
 			promise.then(new InternalResolutionProxy(), new InternalRejectionProxy());
 			cancellationProxy.doCancel(promise);
 		} catch (Throwable throwable) {
 			reject(throwable);
 		}
+	}
+
+	public void doCancel(Cancellable cancellable) {
+		cancellationProxy.doCancel(cancellable);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import com.namehillsoftware.handoff.promises.response.ImmediateAction;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public final class CancellationProxy extends PromisedCancellationToken implements ImmediateAction, CancellationResponse {
+public class CancellationProxy extends PromisedCancellationToken implements ImmediateAction, CancellationResponse {
 	private final Queue<Cancellable> cancellablePromises = new ConcurrentLinkedQueue<>();
 
 	public void doCancel(Cancellable cancellable) {

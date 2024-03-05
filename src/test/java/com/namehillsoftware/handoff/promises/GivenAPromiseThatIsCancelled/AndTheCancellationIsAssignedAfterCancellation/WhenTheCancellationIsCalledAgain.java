@@ -1,7 +1,5 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsCancelled.AndTheCancellationIsAssignedAfterCancellation;
 
-import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.promises.MessengerOperator;
 import com.namehillsoftware.handoff.promises.Promise;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -10,31 +8,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenTheCancellationIsCalledAgain {
 
-	private static int cancellationCalls;
+	private static boolean isCancelled;
 
 	@BeforeClass
 	public static void before() {
-		final MessengerExposingOperator messengerOperator = new MessengerExposingOperator();
-		final Promise<String> cancellablePromise = new Promise<>(messengerOperator);
+		new Promise<String>() {
+			{
+				cancel();
 
-		cancellablePromise.cancel();
+				awaitCancellation(() -> isCancelled = true);
 
-		messengerOperator.messenger.promisedCancellation().must(() -> cancellationCalls++);
-
-		cancellablePromise.cancel();
+				cancel();
+			}
+		};
 	}
 
 	@Test
-	public void thenTheCancellationIsNotCalledTwice() {
-		assertThat(cancellationCalls).isEqualTo(1);
+	public void thenTheCancellationIsNotCalled() {
+		assertThat(isCancelled).isFalse();
 	}
-
-	private static class MessengerExposingOperator implements MessengerOperator<String> {
-		public Messenger<String> messenger;
-
-		@Override
-		public void send(Messenger<String> messenger) {
-			this.messenger = messenger;
-		}
-	};
 }

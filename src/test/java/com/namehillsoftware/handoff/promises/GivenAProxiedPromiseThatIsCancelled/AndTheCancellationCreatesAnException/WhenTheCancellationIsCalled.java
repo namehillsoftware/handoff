@@ -1,11 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAProxiedPromiseThatIsCancelled.AndTheCancellationCreatesAnException;
 
-import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.cancellation.CancellationSignal;
-import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
-import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.propagation.PromiseProxy;
+import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,36 +13,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenTheCancellationIsCalled {
 
-	private static final Messenger<Object> messenger = new Messenger<Object>() {
-
-		@Override
-		public boolean isCancelled() {
-			return token.isCancelled();
-		}
-
-		private final PromisedCancellationToken token = new PromisedCancellationToken();
-
-		@Override
-		public void sendResolution(Object tResult) {}
-
-		@Override
-		public void sendRejection(Throwable error) {}
-		@Override
-		public Promise<Void> promisedCancellation() {
-			return token.promisedCancellation();
-		}
-	};
 	private static boolean unhandledRejection;
 
 	@BeforeClass
 	public static void before() throws Throwable {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
-		final Promise<Object> promisedObject = new Promise<>((m) -> m.promisedCancellation().then(c -> {
-			m.sendRejection(new Exception());
-			return null;
-		}));
-		final PromiseProxy<Object> proxy = new PromiseProxy<>(messenger);
-		proxy.proxy(promisedObject);
+		final Promise<Object> promisedObject = new Promise<>((m) -> {});
+		final ProxyPromise<Object> proxy = new ProxyPromise<Object>() {
+			{
+				proxy(promisedObject);
+			}
+		};
+
+		proxy.cancel();
 	}
 
 	@Test

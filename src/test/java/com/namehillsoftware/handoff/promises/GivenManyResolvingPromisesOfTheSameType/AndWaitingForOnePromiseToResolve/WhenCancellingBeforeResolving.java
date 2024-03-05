@@ -21,40 +21,36 @@ public class WhenCancellingBeforeResolving {
 	public static void before() {
 		final List<Messenger<String>> messengers = new ArrayList<>();
 
-		final Promise<String> firstPromise = new Promise<>(messenger -> {
-			messengers.add(messenger);
-			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
-		});
+		final Promise<String> firstPromise = new Promise<>(
+			messengers::add,
+			messenger -> messenger.sendRejection(new Exception()));
 
 		firstPromise.excuse(e -> {
 			promiseRejections.add(e);
 			return null;
 		});
 
-		final Promise<String> secondPromise = new Promise<>(messenger -> {
-			messengers.add(messenger);
-			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
-		});
+		final Promise<String> secondPromise = new Promise<>(
+			messengers::add,
+			messenger -> messenger.sendRejection(new Exception()));
 
 		secondPromise.excuse(e -> {
 			promiseRejections.add(e);
 			return null;
 		});
 
-		final Promise<String> thirdPromise = new Promise<>(messenger -> {
-			messengers.add(messenger);
-			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
-		});
+		final Promise<String> thirdPromise = new Promise<>(
+			messengers::add,
+			messenger -> messenger.sendRejection(new Exception()));
 
 		thirdPromise.excuse(e -> {
 			promiseRejections.add(e);
 			return null;
 		});
 
-		final Promise<String> fourthPromise = new Promise<>(messenger -> {
-			messengers.add(messenger);
-			messenger.promisedCancellation().must(() -> messenger.sendRejection(new Exception()));
-		});
+		final Promise<String> fourthPromise = new Promise<>(
+			messengers::add,
+			messenger -> messenger.sendRejection(new Exception()));
 
 		fourthPromise.excuse(e -> {
 			promiseRejections.add(e);
