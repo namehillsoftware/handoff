@@ -5,6 +5,8 @@ import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
 public class ProxyPromise<Resolution> extends Promise<Resolution> {
 
+	private final InternalResolutionProxy resolutionProxy = new InternalResolutionProxy();
+	private final InternalRejectionProxy rejectionProxy = new InternalRejectionProxy();
 	private final CancellationProxy cancellationProxy = new CancellationProxy();
 
 	public ProxyPromise(ProvideProxyablePromise<Resolution> provideProxyablePromise) {
@@ -18,7 +20,7 @@ public class ProxyPromise<Resolution> extends Promise<Resolution> {
 
 	protected final void proxy(Promise<Resolution> promise) {
 		try {
-			promise.then(new InternalResolutionProxy(), new InternalRejectionProxy());
+			promise.then(resolutionProxy, rejectionProxy);
 			cancellationProxy.doCancel(promise);
 		} catch (Throwable throwable) {
 			reject(throwable);
