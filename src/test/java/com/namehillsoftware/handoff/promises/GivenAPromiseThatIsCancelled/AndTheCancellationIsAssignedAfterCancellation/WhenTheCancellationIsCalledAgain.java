@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class WhenTheCancellationIsCalledAgain {
 
-	private static int cancellationCalls;
+	private static boolean isCancelled;
 
 	@BeforeClass
 	public static void before() {
@@ -19,14 +19,14 @@ public class WhenTheCancellationIsCalledAgain {
 
 		cancellablePromise.cancel();
 
-		messengerOperator.messenger.promisedCancellation().must(() -> cancellationCalls++);
+		messengerOperator.messenger.awaitCancellation(() -> isCancelled = true);
 
 		cancellablePromise.cancel();
 	}
 
 	@Test
-	public void thenTheCancellationIsNotCalledTwice() {
-		assertThat(cancellationCalls).isEqualTo(1);
+	public void thenTheCancellationIsNotCalled() {
+		assertThat(isCancelled).isFalse();
 	}
 
 	private static class MessengerExposingOperator implements MessengerOperator<String> {

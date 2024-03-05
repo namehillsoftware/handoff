@@ -2,11 +2,11 @@ package com.namehillsoftware.handoff.promises.queued.cancellation.GivenACancella
 
 
 import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
+import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +30,7 @@ public class WhenThePromiseIsCancelledAndNoticed {
 					throw thrownException;
 
 				return "test";
-			}, Executors.newSingleThreadExecutor());
+			}, TestExecutors.TEST_EXECUTOR);
 
 		final CountDownLatch rejectionLatch = new CountDownLatch(1);
 		cancellablePromise.then(

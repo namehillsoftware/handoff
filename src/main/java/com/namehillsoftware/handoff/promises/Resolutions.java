@@ -5,7 +5,7 @@ import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.promises.aggregation.AggregateCancellation;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedErrorExcuse;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedResultsResolver;
-import com.namehillsoftware.handoff.promises.propagation.ProxyingPromise;
+import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +19,7 @@ final class Resolutions {
 
 		AggregatePromiseResolver(Collection<Promise<Resolution>> promises) {
 			this.promises = promises;
-		}
+        }
 
 		@Override
 		public void send(Messenger<Collection<Resolution>> messenger) {
@@ -32,22 +32,24 @@ final class Resolutions {
 			if (errorHandler.isRejected()) return;
 
 			final CollectedResultsResolver<Resolution> resolver = new CollectedResultsResolver<>(messenger, promises);
-			messenger.promisedCancellation().must(new AggregateCancellation<>(messenger, promises, resolver));
+			messenger.awaitCancellation(new AggregateCancellation<>(messenger, promises, resolver));
 		}
 	}
 
-	static final class HonorFirstPromise<Resolution> extends ProxyingPromise<Resolution> implements CancellationResponse {
+	static final class HonorFirstPromise<Resolution> extends ProxyPromise<Resolution> implements CancellationResponse {
 
 		HonorFirstPromise(Collection<Promise<Resolution>> promises) {
 			for (Promise<Resolution> promise : promises) {
                 proxy(promise);
 			}
+
+			awaitCancellation(this);
 		}
 
 		@Override
 		public void cancellationRequested() {
 			reject(new CancellationException());
-			super.cancellationRequested();
+			getCancellationProxy().cancellationRequested();
 		}
 	}
 }

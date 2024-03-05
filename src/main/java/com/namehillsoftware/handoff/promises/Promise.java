@@ -4,7 +4,6 @@ import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
-import com.namehillsoftware.handoff.cancellation.PromisedCancellationToken;
 import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
@@ -15,9 +14,7 @@ import java.util.Collection;
 public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
-		final PromiseMessenger messenger = new PromiseMessenger();
-		awaitCancellation(messenger);
-		messengerOperator.send(messenger);
+		messengerOperator.send(new PromiseMessenger());
 	}
 
 	public Promise(Resolution passThroughResult) {
@@ -122,7 +119,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		private static final Promise emptyPromiseInstance = new Promise<>((Object) null);
 	}
 
-	private final class PromiseMessenger extends PromisedCancellationToken implements Messenger<Resolution>, CancellationResponse {
+	private final class PromiseMessenger implements Messenger<Resolution> {
 		@Override
 		public void sendResolution(Resolution resolution) {
 			resolve(resolution);
@@ -131,6 +128,11 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		@Override
 		public void sendRejection(Throwable error) {
 			reject(error);
+		}
+
+		@Override
+		public void awaitCancellation(CancellationResponse cancellationResponse) {
+			Promise.this.awaitCancellation(cancellationResponse);
 		}
 	}
 }

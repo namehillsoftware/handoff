@@ -31,7 +31,7 @@ public class WhenTheCancellationIsCalled {
 
 			return new Object();
 		}, TestExecutors.TEST_EXECUTOR)
-			.inevitably(() -> new Promise<>((m) -> m.promisedCancellation().must(() -> m.sendRejection(new Exception()))));
+			.inevitably(() -> new Promise<>((m) -> m.awaitCancellation(() -> m.sendRejection(new Exception()))));
 
 		promise.excuse(e -> null);
 
