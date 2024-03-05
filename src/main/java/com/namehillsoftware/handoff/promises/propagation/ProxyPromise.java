@@ -18,8 +18,8 @@ public class ProxyPromise<Resolution> extends Promise<Resolution> {
 
 	protected final void proxy(Promise<Resolution> promise) {
 		try {
-			cancellationProxy.doCancel(promise);
 			promise.then(new InternalResolutionProxy(), new InternalRejectionProxy());
+			cancellationProxy.doCancel(promise);
 		} catch (Throwable throwable) {
 			reject(throwable);
 		}

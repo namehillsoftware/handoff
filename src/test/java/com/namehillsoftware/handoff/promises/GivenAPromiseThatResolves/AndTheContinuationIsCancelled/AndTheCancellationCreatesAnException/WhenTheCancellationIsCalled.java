@@ -21,8 +21,12 @@ public class WhenTheCancellationIsCalled {
 	private static boolean unhandledRejection;
 
 	@BeforeClass
-	public static void before() {
-		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
+	public static void before() throws InterruptedException, TimeoutException {
+		final CountDownLatch rejectionHandledLatch = new CountDownLatch(1);
+		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> {
+			unhandledRejection = true;
+			rejectionHandledLatch.countDown();
+		});
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
 		final Promise<Object> promise = new QueuedPromise<>(() -> {
@@ -33,11 +37,17 @@ public class WhenTheCancellationIsCalled {
 		}, TestExecutors.TEST_EXECUTOR)
 			.eventually(o -> new Promise<>((m) -> m.awaitCancellation(() -> m.sendRejection(new Exception()))));
 
-		promise.excuse(e -> null);
+		promise.excuse(e -> {
+			rejectionHandledLatch.countDown();
+			return null;
+		});
 
 		promise.cancel();
 
 		countDownLatch.countDown();
+
+		if (!rejectionHandledLatch.await(10, TimeUnit.SECONDS))
+			throw new TimeoutException();
 	}
 
 	@Test
