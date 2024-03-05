@@ -94,7 +94,7 @@ publishing {
 
 			pom {
 				name = 'handoff'
-				description = 'A concise description of my library'
+				description = 'A Clean Continuations Library for Java'
 				url = 'https://github.com/namehillsoftware/handoff'
 				licenses {
 					license {
