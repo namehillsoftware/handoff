@@ -8,7 +8,7 @@ import com.namehillsoftware.handoff.promises.Promise;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class AggregateCancellation<TResult> implements CancellationResponse {
+public final class AggregateCancellation<TResult> implements CancellationResponse {
 
 	private final Messenger<Collection<TResult>> collectionMessenger;
 	private final Collection<Promise<TResult>> promises;
