@@ -14,7 +14,7 @@ public class WhenTheCancellationIsCalledTwice {
 	@BeforeClass
 	public static void before() {
 		final Promise<String> cancellablePromise =
-			new Promise<>((messenger) ->{}, mockCancel);
+			new Promise<>((messenger) -> messenger.awaitCancellation(mockCancel));
 
 		cancellablePromise.cancel();
 		cancellablePromise.cancel();

@@ -1,11 +1,9 @@
 package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.cancellation.CancellableMessengerOperator;
 import com.namehillsoftware.handoff.promises.aggregation.AggregateCancellation;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedErrorExcuse;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedResultsResolver;
-import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
 import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 
 import java.util.Collection;
@@ -14,7 +12,7 @@ import java.util.concurrent.CancellationException;
 
 final class Resolutions {
 
-	static final class AggregatePromiseResolver<Resolution> extends CancellationProxy implements CancellableMessengerOperator<Collection<Resolution>> {
+	static final class AggregatePromiseResolver<Resolution> implements MessengerOperator<Collection<Resolution>> {
 
 		private final Collection<Promise<Resolution>> promises;
 
@@ -33,7 +31,7 @@ final class Resolutions {
 			if (errorHandler.isRejected()) return;
 
 			final CollectedResultsResolver<Resolution> resolver = new CollectedResultsResolver<>(messenger, promises);
-			doCancel(new AggregateCancellation<>(messenger, promises, resolver));
+			messenger.awaitCancellation(new AggregateCancellation<>(messenger, promises, resolver));
 		}
 	}
 

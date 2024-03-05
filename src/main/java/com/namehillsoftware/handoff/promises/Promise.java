@@ -3,9 +3,7 @@ package com.namehillsoftware.handoff.promises;
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
-import com.namehillsoftware.handoff.cancellation.CancellableMessengerOperator;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
-import com.namehillsoftware.handoff.cancellation.MessengerCancellationResponse;
 import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
@@ -17,21 +15,6 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 	public Promise(MessengerOperator<Resolution> messengerOperator) {
 		messengerOperator.send(new PromiseMessenger());
-	}
-
-	public Promise(CancellableMessengerOperator<Resolution> messengerOperator) {
-		this(messengerOperator, messengerOperator);
-	}
-
-	public Promise(MessengerOperator<Resolution> messengerOperator, CancellationResponse cancellationResponse) {
-		awaitCancellation(cancellationResponse);
-		messengerOperator.send(new PromiseMessenger());
-	}
-
-	public Promise(MessengerOperator<Resolution> messengerOperator, MessengerCancellationResponse<Resolution> cancellationResponse) {
-		final PromiseMessenger messenger = new PromiseMessenger();
-		awaitCancellation(new PromiseMessengerCancellationResponse(messenger, cancellationResponse));
-		messengerOperator.send(messenger);
 	}
 
 	public Promise(Resolution passThroughResult) {
@@ -146,20 +129,10 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		public void sendRejection(Throwable error) {
 			reject(error);
 		}
-	}
-
-	private final class PromiseMessengerCancellationResponse implements CancellationResponse {
-		private final Messenger<Resolution> messenger;
-		private final MessengerCancellationResponse<Resolution> cancellationResponse;
-
-        private PromiseMessengerCancellationResponse(Messenger<Resolution> messenger, MessengerCancellationResponse<Resolution> cancellationResponse) {
-            this.messenger = messenger;
-            this.cancellationResponse = cancellationResponse;
-        }
 
 		@Override
-		public void cancellationRequested() {
-			cancellationResponse.cancellationRequested(messenger);
+		public void awaitCancellation(CancellationResponse cancellationResponse) {
+			Promise.this.awaitCancellation(cancellationResponse);
 		}
 	}
 }

@@ -1,14 +1,14 @@
 package com.namehillsoftware.handoff.promises.aggregation;
 
 import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.cancellation.Cancellable;
+import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.errors.AggregateCancellationException;
 import com.namehillsoftware.handoff.promises.Promise;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class AggregateCancellation<TResult> implements Cancellable {
+public class AggregateCancellation<TResult> implements CancellationResponse {
 
 	private final Messenger<Collection<TResult>> collectionMessenger;
 	private final Collection<Promise<TResult>> promises;
@@ -21,7 +21,7 @@ public class AggregateCancellation<TResult> implements Cancellable {
 	}
 
 	@Override
-	public void cancel() {
+	public void cancellationRequested() {
 		for (Promise<?> promise : promises) promise.cancel();
 
 		collectionMessenger.sendRejection(new AggregateCancellationException(new ArrayList<>(resultCollector.getResults())));

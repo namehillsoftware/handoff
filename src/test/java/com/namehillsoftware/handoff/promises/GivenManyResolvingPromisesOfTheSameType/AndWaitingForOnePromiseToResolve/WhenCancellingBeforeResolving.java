@@ -22,8 +22,10 @@ public class WhenCancellingBeforeResolving {
 		final List<Messenger<String>> messengers = new ArrayList<>();
 
 		final Promise<String> firstPromise = new Promise<>(
-			messengers::add,
-			messenger -> messenger.sendRejection(new Exception()));
+			messenger -> {
+				messengers.add(messenger);
+				messenger.awaitCancellation(() -> messenger.sendRejection(new Exception()));
+			});
 
 		firstPromise.excuse(e -> {
 			promiseRejections.add(e);
@@ -31,8 +33,10 @@ public class WhenCancellingBeforeResolving {
 		});
 
 		final Promise<String> secondPromise = new Promise<>(
-			messengers::add,
-			messenger -> messenger.sendRejection(new Exception()));
+			messenger -> {
+				messengers.add(messenger);
+				messenger.awaitCancellation(() -> messenger.sendRejection(new Exception()));
+			});
 
 		secondPromise.excuse(e -> {
 			promiseRejections.add(e);
@@ -40,8 +44,10 @@ public class WhenCancellingBeforeResolving {
 		});
 
 		final Promise<String> thirdPromise = new Promise<>(
-			messengers::add,
-			messenger -> messenger.sendRejection(new Exception()));
+			messenger -> {
+				messengers.add(messenger);
+				messenger.awaitCancellation(() -> messenger.sendRejection(new Exception()));
+			});
 
 		thirdPromise.excuse(e -> {
 			promiseRejections.add(e);
@@ -49,8 +55,10 @@ public class WhenCancellingBeforeResolving {
 		});
 
 		final Promise<String> fourthPromise = new Promise<>(
-			messengers::add,
-			messenger -> messenger.sendRejection(new Exception()));
+			messenger -> {
+				messengers.add(messenger);
+				messenger.awaitCancellation(() -> messenger.sendRejection(new Exception()));
+			});
 
 		fourthPromise.excuse(e -> {
 			promiseRejections.add(e);

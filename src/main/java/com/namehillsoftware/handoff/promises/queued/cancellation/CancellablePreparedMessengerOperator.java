@@ -1,10 +1,10 @@
 package com.namehillsoftware.handoff.promises.queued.cancellation;
 
 import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.cancellation.CancellableMessengerOperator;
 import com.namehillsoftware.handoff.cancellation.CancellationToken;
+import com.namehillsoftware.handoff.promises.MessengerOperator;
 
-public final class CancellablePreparedMessengerOperator<Result> extends CancellationToken implements CancellableMessengerOperator<Result> {
+public final class CancellablePreparedMessengerOperator<Result> implements MessengerOperator<Result> {
 	private final CancellableMessageWriter<Result> writer;
 
 	public CancellablePreparedMessengerOperator(CancellableMessageWriter<Result> writer) {
@@ -14,7 +14,9 @@ public final class CancellablePreparedMessengerOperator<Result> extends Cancella
 	@Override
 	public void send(Messenger<Result> messenger) {
 		try {
-			messenger.sendResolution(writer.prepareMessage(this));
+			final CancellationToken cancellationToken = new CancellationToken();
+			messenger.awaitCancellation(cancellationToken);
+			messenger.sendResolution(writer.prepareMessage(cancellationToken));
 		} catch (Throwable throwable) {
 			messenger.sendRejection(throwable);
 		}
