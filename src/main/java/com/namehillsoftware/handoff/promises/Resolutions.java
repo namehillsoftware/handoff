@@ -5,7 +5,6 @@ import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.promises.aggregation.AggregateCancellation;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedErrorExcuse;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedResultsResolver;
-import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,7 +35,7 @@ final class Resolutions {
 		}
 	}
 
-	static final class HonorFirstPromise<Resolution> extends ProxyPromise<Resolution> implements CancellationResponse {
+	static final class HonorFirstPromise<Resolution> extends Promise.Proxy<Resolution> implements CancellationResponse {
 
 		HonorFirstPromise(Collection<Promise<Resolution>> promises) {
 			for (Promise<Resolution> promise : promises) {

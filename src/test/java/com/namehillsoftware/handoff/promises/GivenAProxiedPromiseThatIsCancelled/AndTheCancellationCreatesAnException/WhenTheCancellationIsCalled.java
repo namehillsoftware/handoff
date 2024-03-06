@@ -1,7 +1,6 @@
 package com.namehillsoftware.handoff.promises.GivenAProxiedPromiseThatIsCancelled.AndTheCancellationCreatesAnException;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,7 +18,7 @@ public class WhenTheCancellationIsCalled {
 	public static void before() throws Throwable {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
 		final Promise<Object> promisedObject = new Promise<>((m) -> {});
-		final ProxyPromise<Object> proxy = new ProxyPromise<Object>() {
+		final Promise.Proxy<Object> proxy = new Promise.Proxy<Object>() {
 			{
 				proxy(promisedObject);
 			}

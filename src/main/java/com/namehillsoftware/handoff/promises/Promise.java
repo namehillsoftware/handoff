@@ -5,6 +5,8 @@ import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
+import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
+import com.namehillsoftware.handoff.promises.propagation.ProvideProxyablePromise;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
 
@@ -111,6 +113,65 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
 		public static void toggleStackTraceFiltering(boolean enabled) {
 			HandoffStackTraceFiltering.toggleStackTraceFiltering(enabled);
+		}
+	}
+
+	public static class Proxy<Resolution> extends Promise<Resolution> {
+
+		private final ResolutionProxy<Resolution> resolutionProxy = new ResolutionProxy<>(this);
+		private final RejectionProxy rejectionProxy = new RejectionProxy(this);
+		private final CancellationProxy cancellationProxy = new CancellationProxy();
+
+		public Proxy(ProvideProxyablePromise<Resolution> provideProxyablePromise) {
+			this();
+			proxy(provideProxyablePromise.provide(cancellationProxy));
+		}
+
+		protected Proxy() {
+			awaitCancellation(cancellationProxy);
+		}
+
+		protected final void proxy(Promise<Resolution> promise) {
+			try {
+				promise.then(resolutionProxy, rejectionProxy);
+				cancellationProxy.doCancel(promise);
+			} catch (Throwable throwable) {
+				reject(throwable);
+			}
+		}
+
+		protected CancellationProxy getCancellationProxy() {
+			return cancellationProxy;
+		}
+
+		protected static final class ResolutionProxy<Resolution> implements ImmediateResponse<Resolution, Void> {
+
+			private final Promise<Resolution> promise;
+
+			public ResolutionProxy(Promise<Resolution> promise) {
+				this.promise = promise;
+			}
+
+			@Override
+			public Void respond(Resolution resolution) {
+				promise.resolve(resolution);
+				return null;
+			}
+		}
+
+		protected static final class RejectionProxy implements ImmediateResponse<Throwable, Void> {
+
+			private final Promise<?> promise;
+
+			public RejectionProxy(Promise<?> promise) {
+				this.promise = promise;
+			}
+
+			@Override
+			public Void respond(Throwable throwable) {
+				promise.reject(throwable);
+				return null;
+			}
 		}
 	}
 
