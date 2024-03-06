@@ -1,7 +1,6 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseProxy.AndAPromiseThatCancels.AndOtherCancellables;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ public class WhenCancellingTheProvidedPromise {
 
 	@BeforeClass
 	public static void act() {
-		final ProxyPromise<Object> proxyPromise = new ProxyPromise<>(
+		final Promise.Proxy<Object> proxyPromise = new Promise.Proxy<>(
 			cancellationProxy -> {
 				cancellationProxy.doCancel(() -> Cancellations++);
 				cancellationProxy.doCancel(() -> Cancellations++);

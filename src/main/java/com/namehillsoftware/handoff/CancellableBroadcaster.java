@@ -21,7 +21,7 @@ abstract class CancellableBroadcaster<Resolution> implements Cancellable {
 
     private void closeCancellationAndResolve(Resolution resolution, Throwable rejection) {
         isCancellationClosed.set(true);
-        this.reaction.set(null);
+        this.reaction.lazySet(null);
         resolve(resolution, rejection);
     }
 

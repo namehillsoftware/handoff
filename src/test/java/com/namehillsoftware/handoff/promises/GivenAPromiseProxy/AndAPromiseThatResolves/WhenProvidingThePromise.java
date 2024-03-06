@@ -1,7 +1,6 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseProxy.AndAPromiseThatResolves;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -15,7 +14,7 @@ public class WhenProvidingThePromise {
 
 	@BeforeClass
 	public static void act() {
-		final ProxyPromise<Object> proxyPromise = new ProxyPromise<>(cancellationProxy -> new Promise<>(ExpectedResult));
+		final Promise.Proxy<Object> proxyPromise = new Promise.Proxy<>(cancellationProxy -> new Promise<>(ExpectedResult));
 		proxyPromise.then(r -> Result = r);
 	}
 

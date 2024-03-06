@@ -2,11 +2,10 @@ package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Message;
 import com.namehillsoftware.handoff.RespondingMessenger;
-import com.namehillsoftware.handoff.promises.propagation.ProxyPromise;
 
 abstract class EventuallyRespondingMessenger<Resolution, Response>
 extends
-	ProxyPromise<Response>
+	Promise.Proxy<Response>
 implements
 	RespondingMessenger<Resolution> {
 
