@@ -1,18 +1,16 @@
 package com.namehillsoftware.handoff.cancellation;
 
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class CancellationToken implements CancellationSignal, CancellationResponse {
 
-	private final AtomicBoolean isCancelled = new AtomicBoolean();
+	private volatile boolean isCancelled;
 
 	public final boolean isCancelled() {
-		return isCancelled.get();
+		return isCancelled;
 	}
 
 	@Override
 	public void cancellationRequested() {
-		isCancelled.lazySet(true);
+		isCancelled = true;
 	}
 }

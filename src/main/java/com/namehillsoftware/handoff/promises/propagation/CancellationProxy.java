@@ -3,47 +3,41 @@ package com.namehillsoftware.handoff.promises.propagation;
 
 import com.namehillsoftware.handoff.cancellation.Cancellable;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
-import com.namehillsoftware.handoff.cancellation.CancellationToken;
+import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.errors.RejectionDropper;
 import com.namehillsoftware.handoff.promises.Promise;
 
 import java.util.concurrent.CancellationException;
 
-public class CancellationProxy extends CancellationToken {
-	private final PromisedCancellation promisedCancellation = new PromisedCancellation();
+public class CancellationProxy extends Promise<Void> implements CancellationResponse, CancellationSignal {
+	private volatile boolean isCancelled;
 
 	public CancellationProxy() {
 		// Drop rejections so they don't by default go to the unhandled exception handler
-		promisedCancellation.excuse(RejectionDropper.Instance.get());
+		excuse(RejectionDropper.Instance.get());
+		awaitCancellation(new InternalCancellationResponse());
 	}
 
-	public void doCancel(Cancellable cancellable) {
-		promisedCancellation.then(new ImmediateCancellationResponse(cancellable));
+	public final void doCancel(Cancellable cancellable) {
+		then(new ImmediateCancellationResponse(cancellable));
 	}
 
 	@Override
-	public void cancellationRequested() {
-		super.cancellationRequested();
-		promisedCancellation.resolveCancelled();
+	public final void cancellationRequested() {
+		isCancelled = true;
+		resolve(null);
 	}
 
-	public final Promise<Void> promisedCancellation() {
-		return promisedCancellation;
+	@Override
+	public boolean isCancelled() {
+		return isCancelled;
 	}
 
-	private static final class PromisedCancellation extends Promise<Void> implements CancellationResponse {
-
-		public PromisedCancellation() {
-			awaitCancellation(this);
-		}
+	private final class InternalCancellationResponse implements CancellationResponse {
 
 		@Override
 		public void cancellationRequested() {
 			reject(new PromisedCancellationCancelled());
-		}
-
-		public void resolveCancelled() {
-			resolve(null);
 		}
 	}
 
