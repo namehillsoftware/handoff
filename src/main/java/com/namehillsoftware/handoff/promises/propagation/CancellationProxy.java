@@ -19,7 +19,8 @@ public class CancellationProxy extends Promise<Void> implements CancellationResp
 	}
 
 	public final void doCancel(Cancellable cancellable) {
-		then(new ImmediateCancellationResponse(cancellable));
+		// Drop rejections so they don't by default go to the unhandled exception handler
+		then(new ImmediateCancellationResponse(cancellable), RejectionDropper.Instance.get());
 	}
 
 	@Override
