@@ -3,6 +3,7 @@ package com.namehillsoftware.handoff.promises;
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.SingleMessageBroadcaster;
+import com.namehillsoftware.handoff.cancellation.Cancellable;
 import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
@@ -116,7 +117,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		}
 	}
 
-	public static class Proxy<Resolution> extends Promise<Resolution> {
+	public static class Proxy<Resolution> extends Promise<Resolution> implements CancellationResponse {
 
 		private final ResolutionProxy<Resolution> resolutionProxy = new ResolutionProxy<>(this);
 		private final RejectionProxy rejectionProxy = new RejectionProxy(this);
@@ -128,23 +129,56 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		}
 
 		protected Proxy() {
-			awaitCancellation(cancellationProxy);
+			awaitCancellation(this);
+		}
+
+		@Override
+		public void cancellationRequested() {
+			cancellationProxy.cancellationRequested();
 		}
 
 		protected final void proxy(Promise<Resolution> promise) {
 			try {
-				promise.then(resolutionProxy, rejectionProxy);
-				cancellationProxy.doCancel(promise);
+				proxyResult(promise);
+				doCancel(promise);
 			} catch (Throwable throwable) {
 				reject(throwable);
 			}
 		}
 
-		protected CancellationProxy getCancellationProxy() {
-			return cancellationProxy;
+		protected final void proxyResult(Promise<Resolution> promise) {
+			try {
+				promise.then(resolutionProxy, rejectionProxy);
+			} catch (Throwable throwable) {
+				reject(throwable);
+			}
 		}
 
-		protected static final class ResolutionProxy<Resolution> implements ImmediateResponse<Resolution, Void> {
+		protected final void proxyResolution(Promise<Resolution> promise) {
+			try {
+				promise.then(resolutionProxy);
+			} catch (Throwable throwable) {
+				reject(throwable);
+			}
+		}
+
+		protected final void proxyRejection(Promise<Resolution> promise) {
+			try {
+				promise.excuse(rejectionProxy);
+			} catch (Throwable throwable) {
+				reject(throwable);
+			}
+		}
+
+		protected final void doCancel(Cancellable cancellable) {
+			cancellationProxy.doCancel(cancellable);
+		}
+
+		protected boolean isCancelled() {
+			return cancellationProxy.isCancelled();
+		}
+
+		public static final class ResolutionProxy<Resolution> implements ImmediateResponse<Resolution, Void> {
 
 			private final Promise<Resolution> promise;
 
@@ -159,7 +193,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			}
 		}
 
-		protected static final class RejectionProxy implements ImmediateResponse<Throwable, Void> {
+		public static final class RejectionProxy implements ImmediateResponse<Throwable, Void> {
 
 			private final Promise<?> promise;
 

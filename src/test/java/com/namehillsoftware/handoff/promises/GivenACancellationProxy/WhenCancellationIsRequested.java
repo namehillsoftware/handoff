@@ -26,6 +26,7 @@ public class WhenCancellationIsRequested {
 					exception = (CancellationException) e;
 				return null;
 			});
+		cancellationProxy.cancellationRequested();
 	}
 
 	@Test
