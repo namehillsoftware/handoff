@@ -1,7 +1,6 @@
 package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Messenger;
-import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.promises.aggregation.AggregateCancellation;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedErrorExcuse;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedResultsResolver;
@@ -35,20 +34,18 @@ final class Resolutions {
 		}
 	}
 
-	static final class HonorFirstPromise<Resolution> extends Promise.Proxy<Resolution> implements CancellationResponse {
+	static final class HonorFirstPromise<Resolution> extends Promise.Proxy<Resolution> {
 
 		HonorFirstPromise(Collection<Promise<Resolution>> promises) {
 			for (Promise<Resolution> promise : promises) {
                 proxy(promise);
 			}
-
-			awaitCancellation(this);
 		}
 
 		@Override
 		public void cancellationRequested() {
 			reject(new CancellationException());
-			getCancellationProxy().cancellationRequested();
+			super.cancellationRequested();
 		}
 	}
 }
