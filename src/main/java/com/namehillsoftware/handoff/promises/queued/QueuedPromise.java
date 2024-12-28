@@ -70,8 +70,11 @@ public class QueuedPromise<Resolution> extends Promise<Resolution> {
 
 			@Override
 			public void run() {
-				task.send(this);
-				cancellationResponse.lazySet(null);
+				try {
+					task.send(this);
+				} finally {
+					cancellationResponse.lazySet(null);
+				}
 			}
 
 			@Override
