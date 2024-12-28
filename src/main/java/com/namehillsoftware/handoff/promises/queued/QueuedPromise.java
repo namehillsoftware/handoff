@@ -53,19 +53,17 @@ public class QueuedPromise<Resolution> extends Promise<Resolution> {
 
 			@Override
 			public void sendResolution(Resolution resolution) {
-				if (this.resultMessenger != null)
-					this.resultMessenger.sendResolution(resolution);
+				resultMessenger.sendResolution(resolution);
 			}
 
 			@Override
 			public void sendRejection(Throwable error) {
-				if (this.resultMessenger != null)
-					this.resultMessenger.sendRejection(error);
+				resultMessenger.sendRejection(error);
 			}
 
 			@Override
 			public void awaitCancellation(CancellationResponse cancellationResponse) {
-				if (this.cancellationResponse.compareAndSet(null, cancellationResponse)) {
+				if (this.cancellationResponse.getAndSet(cancellationResponse) == null) {
 					cancellationProxy.doCancel(this);
 				}
 			}
@@ -73,11 +71,12 @@ public class QueuedPromise<Resolution> extends Promise<Resolution> {
 			@Override
 			public void run() {
 				task.send(this);
+				cancellationResponse.lazySet(null);
 			}
 
 			@Override
 			public void cancel() {
-				final CancellationResponse cancellationResponse = this.cancellationResponse.getAndSet(null);
+				final CancellationResponse cancellationResponse = this.cancellationResponse.get();
 				if (cancellationResponse != null)
 					cancellationResponse.cancellationRequested();
 			}
