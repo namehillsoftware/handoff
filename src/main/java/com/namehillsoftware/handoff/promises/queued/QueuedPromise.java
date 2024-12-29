@@ -6,13 +6,13 @@ import com.namehillsoftware.handoff.promises.queued.cancellation.CancellableMess
 
 import java.util.concurrent.Executor;
 
-public class ExecutedPromise<Resolution> extends Promise<Resolution> {
+public class QueuedPromise<Resolution> extends Promise<Resolution> {
 
-	public ExecutedPromise(CancellableMessageWriter<Resolution> task, Executor executor) {
+	public QueuedPromise(CancellableMessageWriter<Resolution> task, Executor executor) {
 		executor.execute(new QueuedCancellableMessageReader(task));
 	}
 
-	public ExecutedPromise(MessageWriter<Resolution> task, Executor executor) {
+	public QueuedPromise(MessageWriter<Resolution> task, Executor executor) {
 		executor.execute(new QueuedMessageReader(task));
 	}
 
@@ -38,7 +38,7 @@ public class ExecutedPromise<Resolution> extends Promise<Resolution> {
 		private final CancellableMessageWriter<Resolution> task;
 
 		private QueuedCancellableMessageReader(CancellableMessageWriter<Resolution> task) {
-			ExecutedPromise.this.awaitCancellation(cancellationProxy);
+			QueuedPromise.this.awaitCancellation(cancellationProxy);
 			this.task = task;
 		}
 

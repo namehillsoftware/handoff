@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsRejected;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.queued.ExecutedPromise;
+import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class WhenCancellingTheResponse {
 		final CountDownLatch cancellationLatch = new CountDownLatch(1);
 		final CountDownLatch resultLatch = new CountDownLatch(1);
 
-		final Promise<Void> queuedPromise = new ExecutedPromise<>(() -> {
+		final Promise<Void> queuedPromise = new QueuedPromise<>(() -> {
 			cancellationLatch.await();
 			throw new Exception("whoops");
 		}, TestExecutors.TEST_EXECUTOR);

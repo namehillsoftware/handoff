@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves.AndAlwaysFinishesWithAnAction;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.queued.ExecutedPromise;
+import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -24,7 +24,7 @@ public class WhenTheActionIsCancelled {
 	public static void before() throws InterruptedException {
 		final CountDownLatch testReadyLatch = new CountDownLatch(1);
 
-		final Promise<String> promisedMustAction = new ExecutedPromise<>(() -> {
+		final Promise<String> promisedMustAction = new QueuedPromise<>(() -> {
 			testReadyLatch.await();
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)

@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.queued.cancellation.GivenACancellableQueuedPromise;
 
 
-import com.namehillsoftware.handoff.promises.queued.ExecutedPromise;
+import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class WhenThePromiseIsCancelledImmediately {
 
 	@BeforeClass
 	public static void before() throws InterruptedException {
-		final ExecutedPromise<String> cancellablePromise = new ExecutedPromise<>((cp) -> {
+		final QueuedPromise<String> cancellablePromise = new QueuedPromise<>((cp) -> {
 			if (cp.isCancelled())
 				throw thrownException;
 

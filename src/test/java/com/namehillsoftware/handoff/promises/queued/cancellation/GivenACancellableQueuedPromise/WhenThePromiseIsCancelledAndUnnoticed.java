@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.queued.cancellation.GivenACancellableQueuedPromise;
 
 
-import com.namehillsoftware.handoff.promises.queued.ExecutedPromise;
+import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ public class WhenThePromiseIsCancelledAndUnnoticed {
 	@BeforeClass
 	public static void before() throws InterruptedException {
 		final CountDownLatch promiseLatch = new CountDownLatch(1);
-		final ExecutedPromise<String> cancellablePromise = new ExecutedPromise<>(
+		final QueuedPromise<String> cancellablePromise = new QueuedPromise<>(
 			(cancellationToken) -> {
 				if (cancellationToken.isCancelled())
 					throw new Exception();
