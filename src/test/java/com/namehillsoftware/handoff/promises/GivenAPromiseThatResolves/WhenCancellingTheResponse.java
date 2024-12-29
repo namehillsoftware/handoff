@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
+import com.namehillsoftware.handoff.promises.queued.ExecutedPromise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class WhenCancellingTheResponse {
 		// Use latches to ensure correct order of execution.
 		final CountDownLatch cancellationLatch = new CountDownLatch(1);
 		final CountDownLatch resultLatch = new CountDownLatch(1);
-		final Promise<String> response = new QueuedPromise<>(() -> {
+		final Promise<String> response = new ExecutedPromise<>(() -> {
 			cancellationLatch.await();
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)

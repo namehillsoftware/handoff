@@ -4,20 +4,16 @@ import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
 import com.namehillsoftware.handoff.promises.queued.cancellation.CancellableMessageWriter;
 
-public class RunnablePromise<Resolution> extends Promise<Resolution> implements Runnable {
-	private final Runnable runnable;
+import java.util.concurrent.Executor;
 
-	public RunnablePromise(CancellableMessageWriter<Resolution> task) {
-		this.runnable = new QueuedCancellableMessageReader(task);
+public class ExecutedPromise<Resolution> extends Promise<Resolution> {
+
+	public ExecutedPromise(CancellableMessageWriter<Resolution> task, Executor executor) {
+		executor.execute(new QueuedCancellableMessageReader(task));
 	}
 
-	public RunnablePromise(MessageWriter<Resolution> task) {
-		this.runnable = new QueuedMessageReader(task);
-	}
-
-	@Override
-	public final void run() {
-		this.runnable.run();
+	public ExecutedPromise(MessageWriter<Resolution> task, Executor executor) {
+		executor.execute(new QueuedMessageReader(task));
 	}
 
 	private final class QueuedMessageReader implements Runnable {
@@ -42,7 +38,7 @@ public class RunnablePromise<Resolution> extends Promise<Resolution> implements 
 		private final CancellableMessageWriter<Resolution> task;
 
 		private QueuedCancellableMessageReader(CancellableMessageWriter<Resolution> task) {
-			RunnablePromise.this.awaitCancellation(cancellationProxy);
+			ExecutedPromise.this.awaitCancellation(cancellationProxy);
 			this.task = task;
 		}
 

@@ -1,7 +1,7 @@
 package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves.AndTheContinuationIsCancelled.AndTheCancellationCreatesAnException;
 
 import com.namehillsoftware.handoff.promises.Promise;
-import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
+import com.namehillsoftware.handoff.promises.queued.ExecutedPromise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class WhenTheCancellationIsCalled {
 		});
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
-		final Promise<Object> promise = new QueuedPromise<>(() -> {
+		final Promise<Object> promise = new ExecutedPromise<>(() -> {
 			if (!countDownLatch.await(10, TimeUnit.SECONDS))
 				throw new TimeoutException();
 
