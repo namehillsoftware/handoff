@@ -17,8 +17,11 @@ public class WhenThePromiseIsCancelledImmediately {
 
 	@BeforeClass
 	public static void before() throws InterruptedException {
-		final QueuedPromise<String> cancellablePromise = new QueuedPromise<>((messenger) -> {
-			messenger.awaitCancellation(() -> messenger.sendRejection(thrownException));
+		final QueuedPromise<String> cancellablePromise = new QueuedPromise<>(cs -> {
+			if (cs.isCancelled())
+				throw thrownException;
+
+			return "";
 		}, TestExecutors.TEST_EXECUTOR);
 
 		cancellablePromise.cancel();

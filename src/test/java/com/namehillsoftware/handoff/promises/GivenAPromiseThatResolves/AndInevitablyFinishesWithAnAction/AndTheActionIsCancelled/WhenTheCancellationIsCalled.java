@@ -25,7 +25,7 @@ public class WhenTheCancellationIsCalled {
 		Promise.Rejections.setUnhandledRejectionsReceiver(rejection -> unhandledRejection = true);
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
-		final Promise<Object> promise = new QueuedPromise<>(() -> {
+		final Promise<Object> promise = new QueuedPromise<>(cs -> {
 			if (!countDownLatch.await(10, TimeUnit.SECONDS))
 				throw new TimeoutException();
 

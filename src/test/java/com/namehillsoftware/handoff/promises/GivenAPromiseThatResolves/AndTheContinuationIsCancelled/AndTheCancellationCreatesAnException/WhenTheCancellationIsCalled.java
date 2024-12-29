@@ -29,7 +29,7 @@ public class WhenTheCancellationIsCalled {
 		});
 
 		final CountDownLatch countDownLatch = new CountDownLatch(1);
-		final Promise<Object> promise = new QueuedPromise<>(() -> {
+		final Promise<Object> promise = new QueuedPromise<>(cs -> {
 			if (!countDownLatch.await(10, TimeUnit.SECONDS))
 				throw new TimeoutException();
 
