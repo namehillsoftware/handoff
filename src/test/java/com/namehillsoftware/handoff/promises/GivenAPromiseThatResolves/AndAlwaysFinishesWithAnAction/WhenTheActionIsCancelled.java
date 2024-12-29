@@ -24,7 +24,7 @@ public class WhenTheActionIsCancelled {
 	public static void before() throws InterruptedException {
 		final CountDownLatch testReadyLatch = new CountDownLatch(1);
 
-		final Promise<String> promisedMustAction = new QueuedPromise<>(() -> {
+		final Promise<String> promisedMustAction = new QueuedPromise<>(cs -> {
 			testReadyLatch.await();
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)

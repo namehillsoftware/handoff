@@ -20,7 +20,7 @@ public class WhenCancellingTheResponse {
 		// Use latches to ensure correct order of execution.
 		final CountDownLatch cancellationLatch = new CountDownLatch(1);
 		final CountDownLatch resultLatch = new CountDownLatch(1);
-		final Promise<String> response = new QueuedPromise<>(() -> {
+		final Promise<String> response = new QueuedPromise<>(cs -> {
 			cancellationLatch.await();
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)

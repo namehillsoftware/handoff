@@ -5,6 +5,7 @@ public class CancellationToken implements CancellationSignal, CancellationRespon
 
 	private volatile boolean isCancelled;
 
+	@Override
 	public final boolean isCancelled() {
 		return isCancelled;
 	}

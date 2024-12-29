@@ -21,7 +21,7 @@ public class WhenCancellingTheResponse {
 		final CountDownLatch cancellationLatch = new CountDownLatch(1);
 		final CountDownLatch resultLatch = new CountDownLatch(1);
 
-		final Promise<Void> queuedPromise = new QueuedPromise<>(() -> {
+		final Promise<Void> queuedPromise = new QueuedPromise<>(cs -> {
 			cancellationLatch.await();
 			throw new Exception("whoops");
 		}, TestExecutors.TEST_EXECUTOR);
