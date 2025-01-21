@@ -4,19 +4,17 @@ import com.namehillsoftware.handoff.cancellation.CancellationToken;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.CancellableMessageWriter;
 
-public class DispatchablePromise<Resolution> extends Promise<Resolution> {
+public abstract class DispatchablePromise<Resolution> extends Promise<Resolution> implements CancellableMessageWriter<Resolution> {
 
 	private final CancellationToken cancellationToken = new CancellationToken();
-	private final CancellableMessageWriter<Resolution> messageWriter;
 
-	public DispatchablePromise(CancellableMessageWriter<Resolution> messageWriter) {
+	public DispatchablePromise() {
 		awaitCancellation(cancellationToken);
-		this.messageWriter = messageWriter;
 	}
 
 	public final void dispatchMessage() {
 		try {
-			resolve(messageWriter.prepareMessage(cancellationToken));
+			resolve(prepareMessage(cancellationToken));
 		} catch (Throwable e) {
 			reject(e);
 		}

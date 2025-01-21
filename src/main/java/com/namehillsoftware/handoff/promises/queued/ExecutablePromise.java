@@ -1,11 +1,9 @@
 package com.namehillsoftware.handoff.promises.queued;
 
-import com.namehillsoftware.handoff.promises.queued.cancellation.CancellableMessageWriter;
+public abstract class ExecutablePromise<Resolution> extends DispatchablePromise<Resolution> implements Runnable {
 
-public class ExecutablePromise<Resolution> extends DispatchablePromise<Resolution> implements Runnable {
-
-    public ExecutablePromise(CancellableMessageWriter<Resolution> messageWriter) {
-        super(messageWriter);
+    public ExecutablePromise() {
+        super();
     }
 
     @Override

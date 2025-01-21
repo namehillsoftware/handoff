@@ -3,22 +3,23 @@ package com.namehillsoftware.handoff.promises.GivenAPromiseThatResolves.AndAlway
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.queued.QueuedPromise;
 import com.namehillsoftware.handoff.promises.queued.cancellation.TestExecutors;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by david on 10/17/16.
  */
 public class WhenTheActionIsCancelled {
 
-	private static String nextReturningPromiseResult;
-	private static boolean isCalled;
-	private static boolean isCancelled;
+	private static volatile String nextReturningPromiseResult;
+	private static volatile boolean isCalled;
+	private static volatile boolean isCancelled;
 
 	@BeforeClass
 	public static void before() throws InterruptedException {
@@ -29,7 +30,7 @@ public class WhenTheActionIsCancelled {
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)
 			.must((cancellationSignal) -> {
-				isCancelled = true;
+				isCancelled = cancellationSignal.isCancelled();
 				isCalled = true;
 			});
 
@@ -47,11 +48,11 @@ public class WhenTheActionIsCancelled {
 
 	@Test
 	public void thenTheNextActionReturnsAPromiseOfTheCorrectType() {
-		Assert.assertEquals("test", nextReturningPromiseResult);
+		assertEquals("test", nextReturningPromiseResult);
 	}
 
 	@Test
 	public void thenTheAlwaysConditionIsCalled() {
-		Assert.assertTrue(isCalled);
+		assertTrue(isCalled);
 	}
 }

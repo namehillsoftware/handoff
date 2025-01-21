@@ -17,7 +17,10 @@ public class WhenThePromiseIsCancelledImmediately {
 
 	@BeforeClass
 	public static void before() throws InterruptedException {
+		final CountDownLatch cancellationLatch = new CountDownLatch(1);
 		final QueuedPromise<String> cancellablePromise = new QueuedPromise<>(cs -> {
+			cancellationLatch.await();
+
 			if (cs.isCancelled())
 				throw thrownException;
 
@@ -25,6 +28,7 @@ public class WhenThePromiseIsCancelledImmediately {
 		}, TestExecutors.TEST_EXECUTOR);
 
 		cancellablePromise.cancel();
+		cancellationLatch.countDown();
 
 		final CountDownLatch rejectionLatch = new CountDownLatch(1);
 		cancellablePromise.then(
