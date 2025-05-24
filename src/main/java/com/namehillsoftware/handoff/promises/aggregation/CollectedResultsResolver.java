@@ -4,23 +4,23 @@ import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CollectedResultsResolver<TResult> implements ImmediateResponse<TResult, Void> {
-	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-	private final LinkedList<TResult> collectedResults = new LinkedList<>();
-	private final int expectedResultSize;
+	private final ConcurrentLinkedQueue<ResultBox<TResult>> collectedResults = new ConcurrentLinkedQueue<>();
+	private final int expectedSize;
+	private final AtomicInteger remainingResults;
 	private final Messenger<Collection<TResult>> collectionMessenger;
 
 	public CollectedResultsResolver(Messenger<Collection<TResult>> collectionMessenger, Collection<Promise<TResult>> promises) {
 		this.collectionMessenger = collectionMessenger;
 
-		expectedResultSize = promises.size();
+		expectedSize = promises.size();
+		remainingResults = new AtomicInteger(expectedSize);
 
 		for (Promise<TResult> promise : promises) promise.then(this);
 
@@ -30,40 +30,26 @@ public class CollectedResultsResolver<TResult> implements ImmediateResponse<TRes
 
 	@Override
 	public Void respond(TResult result) {
-		final Lock lock = readWriteLock.writeLock();
-		lock.lock();
-		try {
-			collectedResults.add(result);
-		} finally {
-			lock.unlock();
-		}
+		collectedResults.add(new ResultBox<>(result));
 
-		attemptResolve();
+		if (remainingResults.decrementAndGet() <= 0 && collectionMessenger != null)
+			collectionMessenger.sendResolution(getResults());
 
 		return null;
 	}
 
-	private void attemptResolve() {
-		if (collectionMessenger == null) return;
-
-		final Lock lock = readWriteLock.readLock();
-		lock.lock();
-		try {
-			if (collectedResults.size() < expectedResultSize) return;
-
-			collectionMessenger.sendResolution(collectedResults);
-		} finally {
-			lock.unlock();
+	public final Collection<TResult> getResults() {
+		final ArrayList<TResult> results = new ArrayList<>(expectedSize);
+		for (ResultBox<TResult> box : collectedResults) {
+			results.add(box.result);
 		}
+		return results;
 	}
 
-	public final Collection<TResult> getResults() {
-		final Lock lock = readWriteLock.readLock();
-		lock.lock();
-		try {
-			return collectedResults;
-		} finally {
-			lock.unlock();
+	private static class ResultBox<TResult> {
+		final TResult result;
+		ResultBox(TResult result) {
+			this.result = result;
 		}
 	}
 }
