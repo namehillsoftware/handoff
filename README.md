@@ -297,3 +297,28 @@ class PromisedResponse extends Promise<String> implements Callback, Cancellation
     }
 }
 ```
+
+## Why?
+
+There's a few different continuation approaches by the big guys: Kotlin has coroutines, and Java has Loom, CompletableFuture,
+and perhaps something else in the future? RxJava can also represent a promise as a Single. Why would you choose Handoff 
+over these built-in solutions? First off: if you're happy with those approaches, then continue using them!
+
+Handoff was originally developed because of the difficulties of AsyncTask in Android's early days. AsyncTask made it hard
+to propagate continuations, while the Promise structure provides a well-known interface to do that.
+
+Beyond that, I still use Handoff in Android development because of a few problems it solves, or doesn't create. You might
+find you also have these problems.
+
+- Handoff doens't care about your threading model or require you to understand any sort of "synchronization context", "dispatcher", etc.
+In simplistic terms, Handoff just provides a nice standardized way to write and handle callbacks in Java. It pushes no 
+requirements on the developer on how they may use it.
+- Handoff doesn't have an extensive API. The few basic things you need to know:
+  - How to create a Promise (`new Promise<>(m -> {})` is one way).
+  - How to immediately handle a Promise result (`then`).
+  - How to handle a Promise with another Promise (`eventually`).
+  - Other API's that I occasionally have to use:
+    - Error handlers: `excuse`, `excuseEventually`.
+    - Finalization handlers: `must`, `inevitably`.
+  - I would have made this API even smaller if Java generics weren't erased at runtime!
+- Handoff's Promise resolving rules are simple enough that most other concurrency approaches can be easily adapted.

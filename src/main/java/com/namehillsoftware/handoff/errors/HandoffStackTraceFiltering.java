@@ -2,13 +2,21 @@ package com.namehillsoftware.handoff.errors;
 
 import com.namehillsoftware.handoff.Messenger;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public final class HandoffStackTraceFiltering {
 
 	// Use a module in the root namespace
-	private static final String packageName = Messenger.class.getPackage().getName();
+	private static String packageName = null;
 	private static final String omittedStackTrace = " handoff frames omitted from stack trace";
+
+	static {
+		final Package pkg = Messenger.class.getPackage();
+		if (pkg != null) {
+			packageName = pkg.getName();
+		}
+	}
 
 	private static boolean isStackTraceFilteringEnabled;
 
@@ -17,10 +25,10 @@ public final class HandoffStackTraceFiltering {
 	}
 
 	public static void filterStackTrace(Throwable error) {
-		if (!isStackTraceFilteringEnabled) return;
+		if (!isStackTraceFilteringEnabled || packageName == null) return;
 
 		final StackTraceElement[] stackTraceElements = error.getStackTrace();
-		final ArrayList<StackTraceElement> reducedStackTraceElements = new ArrayList<>(stackTraceElements.length);
+		final LinkedList<StackTraceElement> reducedStackTraceElements = new LinkedList<>();
 
 		StackTraceElement firstOmittedStackTraceElement = null;
 		StackTraceElement lastOmittedStackTraceElement = null;
@@ -52,7 +60,7 @@ public final class HandoffStackTraceFiltering {
 		error.setStackTrace(reducedStackTraceElements.toArray(newStackTrace));
 	}
 
-	private static void fillInOmittedElements(StackTraceElement firstOmittedStackTraceElement, StackTraceElement lastOmittedStackTraceElement, int omittedStackTraceElementsSize, ArrayList<StackTraceElement> reducedStackTraceElements) {
+	private static void fillInOmittedElements(StackTraceElement firstOmittedStackTraceElement, StackTraceElement lastOmittedStackTraceElement, int omittedStackTraceElementsSize, List<StackTraceElement> reducedStackTraceElements) {
 		if (firstOmittedStackTraceElement != null)
 			reducedStackTraceElements.add(firstOmittedStackTraceElement);
 
