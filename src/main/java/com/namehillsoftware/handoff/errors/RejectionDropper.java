@@ -1,13 +1,14 @@
 package com.namehillsoftware.handoff.errors;
 
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
+import org.jspecify.annotations.NonNull;
 
-public final class RejectionDropper implements ImmediateResponse<Throwable, Void> {
+public final class RejectionDropper implements ImmediateResponse<@NonNull Throwable, Void> {
 
 	private RejectionDropper() {}
 
 	@Override
-	public Void respond(Throwable throwable) throws Throwable {
+	public Void respond(@NonNull Throwable throwable) throws Throwable {
 		return null;
 	}
 

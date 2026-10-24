@@ -3,13 +3,16 @@ package com.namehillsoftware.handoff.promises.aggregation;
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.Promise;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 
+@NullMarked
 public class CollectedErrorExcuse<TResult> implements ImmediateResponse<Throwable, Throwable> {
 
 	private final Messenger<Collection<TResult>> messenger;
-	private Throwable error;
+	private @Nullable Throwable error;
 
 	public CollectedErrorExcuse(Messenger<Collection<TResult>> messenger, Collection<Promise<TResult>> promises) {
 		this.messenger = messenger;
@@ -24,7 +27,7 @@ public class CollectedErrorExcuse<TResult> implements ImmediateResponse<Throwabl
 	}
 
 	private void attemptRejection() {
-		if (messenger != null && error != null)
+		if (error != null)
 			messenger.sendRejection(error);
 	}
 

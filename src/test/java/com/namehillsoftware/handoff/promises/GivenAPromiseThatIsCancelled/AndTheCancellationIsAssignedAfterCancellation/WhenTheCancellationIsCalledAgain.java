@@ -3,6 +3,7 @@ package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsCancelled.AndTh
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.MessengerOperator;
 import com.namehillsoftware.handoff.promises.Promise;
+import org.jspecify.annotations.NonNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,7 +34,7 @@ public class WhenTheCancellationIsCalledAgain {
 		public Messenger<String> messenger;
 
 		@Override
-		public void send(Messenger<String> messenger) {
+		public void send(@NonNull Messenger<String> messenger) {
 			this.messenger = messenger;
 		}
 	};

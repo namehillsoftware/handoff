@@ -10,21 +10,25 @@ import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
 import com.namehillsoftware.handoff.promises.propagation.ProvideProxyablePromise;
 import com.namehillsoftware.handoff.promises.response.*;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+@NullUnmarked
 public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 
-	public Promise(MessengerOperator<Resolution> messengerOperator) {
+	public Promise(@NonNull MessengerOperator<Resolution> messengerOperator) {
 		messengerOperator.send(new PromiseMessenger());
 	}
 
-	public Promise(Resolution passThroughResult) {
+	public Promise(@Nullable Resolution passThroughResult) {
 		resolve(passThroughResult);
 	}
 
-	public Promise(Throwable rejection) {
+	public Promise(@NonNull Throwable rejection) {
 		reject(rejection);
 	}
 
@@ -36,74 +40,74 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		return onFulfilled;
 	}
 
-	public final <NewResolution> Promise<NewResolution> then(ImmediateResponse<Resolution, NewResolution> onFulfilled) {
+	public final <NewResolution> @NonNull Promise<NewResolution> then(@NonNull ImmediateResponse<Resolution, NewResolution> onFulfilled) {
 		return then(new PromiseImmediateResponse<>(onFulfilled));
 	}
 
-	public final <NewResolution> Promise<NewResolution> then(ImmediateCancellableResponse<Resolution, NewResolution> onFulfilled) {
+	public final <NewResolution> @NonNull Promise<NewResolution> then(@NonNull ImmediateCancellableResponse<Resolution, NewResolution> onFulfilled) {
 		return then(new PromiseImmediateCancellableResponse<>(onFulfilled));
 	}
 
-	public final <NewResolution> Promise<NewResolution> then(ImmediateResponse<Resolution, NewResolution> onFulfilled, ImmediateResponse<Throwable, NewResolution> onRejected) {
+	public final <NewResolution> @NonNull Promise<NewResolution> then(@NonNull ImmediateResponse<Resolution, NewResolution> onFulfilled, @NonNull ImmediateResponse<@NonNull Throwable, NewResolution> onRejected) {
 		return then(new PromiseImmediateResponse<>(onFulfilled, onRejected));
 	}
 
-	public final <NewResolution> Promise<NewResolution> then(ImmediateCancellableResponse<Resolution, NewResolution> onFulfilled, ImmediateCancellableResponse<Throwable, NewResolution> onRejected) {
+	public final <NewResolution> @NonNull Promise<NewResolution> then(@NonNull ImmediateCancellableResponse<Resolution, NewResolution> onFulfilled, @NonNull ImmediateCancellableResponse<@NonNull Throwable, NewResolution> onRejected) {
 		return then(new PromiseImmediateCancellableResponse<>(onFulfilled, onRejected));
 	}
 
-	public final <NewResolution> Promise<NewResolution> eventually(PromisedResponse<Resolution, NewResolution> onFulfilled) {
+	public final <NewResolution> @NonNull Promise<NewResolution> eventually(@NonNull PromisedResponse<Resolution, NewResolution> onFulfilled) {
 		return then(new PromisedEventualResponse<>(onFulfilled));
 	}
 
-	public final <NewResolution> Promise<NewResolution> eventually(PromisedResponse<Resolution, NewResolution> onFulfilled, PromisedResponse<Throwable, NewResolution> onRejected) {
+	public final <NewResolution> @NonNull Promise<NewResolution> eventually(@NonNull PromisedResponse<Resolution, NewResolution> onFulfilled, @NonNull PromisedResponse<@NonNull Throwable, NewResolution> onRejected) {
 		return then(new PromisedEventualResponse<>(onFulfilled, onRejected));
 	}
 
-	public final <NewResolution> Promise<NewResolution> excuse(ImmediateResponse<Throwable, NewResolution> onRejected) {
+	public final <NewResolution> @NonNull Promise<NewResolution> excuse(@NonNull ImmediateResponse<@NonNull Throwable, NewResolution> onRejected) {
 		return then(new RejectedResponsePromise<>(onRejected));
 	}
 
-	public final <NewResolution> Promise<NewResolution> excuse(ImmediateCancellableResponse<Throwable, NewResolution> onRejected) {
+	public final <NewResolution> @NonNull Promise<NewResolution> excuse(@NonNull ImmediateCancellableResponse<@NonNull Throwable, NewResolution> onRejected) {
 		return then(new RejectedCancellableResponsePromise<>(onRejected));
 	}
 
-	public final <NewResolution> Promise<NewResolution> eventuallyExcuse(PromisedResponse<Throwable, NewResolution> onRejected) {
+	public final <NewResolution> @NonNull Promise<NewResolution> eventuallyExcuse(@NonNull PromisedResponse<@NonNull Throwable, NewResolution> onRejected) {
 		return then(new PromisedEventualRejection<>(onRejected));
 	}
 
-	public final Promise<Resolution> must(ImmediateAction onAny) {
+	public final @NonNull Promise<Resolution> must(@NonNull ImmediateAction onAny) {
 		return then(new ImmediateActionResponse<>(onAny));
 	}
 
-	public final Promise<Resolution> must(ImmediateCancellableAction onAny) {
+	public final @NonNull Promise<Resolution> must(@NonNull ImmediateCancellableAction onAny) {
 		return then(new ImmediateCancellableActionResponse<>(onAny));
 	}
 
-	public final Promise<Resolution> inevitably(EventualAction onAny) {
+	public final @NonNull Promise<Resolution> inevitably(@NonNull EventualAction onAny) {
 		return then(new PromisedEventualAction<>(onAny));
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <Resolution> Promise<Resolution> empty() {
+	public static <Resolution> @NonNull Promise<@Nullable Resolution> empty() {
 		return LazyEmptyPromiseHolder.emptyPromiseInstance;
 	}
 
 	@SafeVarargs
-	public static <Resolution> Promise<Collection<Resolution>> whenAll(Promise<Resolution>... promises) {
+	public static <Resolution> @NonNull Promise<Collection<Resolution>> whenAll(@NonNull Promise<Resolution>... promises) {
 		return whenAll(Arrays.asList(promises));
 	}
 
-	public static <Resolution> Promise<Collection<Resolution>> whenAll(Collection<Promise<Resolution>> promises) {
+	public static <Resolution> @NonNull Promise<Collection<Resolution>> whenAll(@NonNull Collection<Promise<Resolution>> promises) {
 		return new Promise<>(new Resolutions.AggregatePromiseResolver<>(promises));
 	}
 
 	@SafeVarargs
-	public static <Resolution> Promise<Resolution> whenAny(Promise<Resolution>... promises) {
+	public static <Resolution> @NonNull Promise<Resolution> whenAny(@NonNull Promise<Resolution>... promises) {
 		return whenAny(Arrays.asList(promises));
 	}
 
-	public static <Resolution> Promise<Resolution> whenAny(Collection<Promise<Resolution>> promises) {
+	public static <Resolution> @NonNull Promise<Resolution> whenAny(@NonNull Collection<Promise<Resolution>> promises) {
 		return new Resolutions.HonorFirstPromise<>(promises);
 	}
 
@@ -123,7 +127,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		private final RejectionProxy rejectionProxy = new RejectionProxy(this);
 		private final CancellationProxy cancellationProxy = new CancellationProxy();
 
-		public Proxy(ProvideProxyablePromise<Resolution> provideProxyablePromise) {
+		public Proxy(@NonNull ProvideProxyablePromise<Resolution> provideProxyablePromise) {
 			this();
 			proxy(provideProxyablePromise.provide(cancellationProxy));
 		}
@@ -137,7 +141,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			cancellationProxy.cancellationRequested();
 		}
 
-		protected final void proxy(Promise<Resolution> promise) {
+		protected final void proxy(@NonNull Promise<Resolution> promise) {
 			try {
 				proxyResult(promise);
 				doCancel(promise);
@@ -146,7 +150,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			}
 		}
 
-		protected final void proxyResult(Promise<Resolution> promise) {
+		protected final void proxyResult(@NonNull Promise<Resolution> promise) {
 			try {
 				promise.then(resolutionProxy, rejectionProxy);
 			} catch (Throwable throwable) {
@@ -154,7 +158,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			}
 		}
 
-		protected final void proxyResolution(Promise<Resolution> promise) {
+		protected final void proxyResolution(@NonNull Promise<Resolution> promise) {
 			try {
 				promise.then(resolutionProxy);
 			} catch (Throwable throwable) {
@@ -162,7 +166,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			}
 		}
 
-		protected final void proxyRejection(Promise<Resolution> promise) {
+		protected final void proxyRejection(@NonNull Promise<Resolution> promise) {
 			try {
 				promise.excuse(rejectionProxy);
 			} catch (Throwable throwable) {
@@ -170,7 +174,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			}
 		}
 
-		protected final void doCancel(Cancellable cancellable) {
+		protected final void doCancel(@NonNull Cancellable cancellable) {
 			cancellationProxy.doCancel(cancellable);
 		}
 
@@ -193,7 +197,7 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 			}
 		}
 
-		public static final class RejectionProxy implements ImmediateResponse<Throwable, Void> {
+		public static final class RejectionProxy implements ImmediateResponse<@NonNull Throwable, Void> {
 
 			private final Promise<?> promise;
 
@@ -221,12 +225,12 @@ public class Promise<Resolution> extends SingleMessageBroadcaster<Resolution> {
 		}
 
 		@Override
-		public void sendRejection(Throwable error) {
+		public void sendRejection(@NonNull Throwable error) {
 			reject(error);
 		}
 
 		@Override
-		public void awaitCancellation(CancellationResponse cancellationResponse) {
+		public void awaitCancellation(@NonNull CancellationResponse cancellationResponse) {
 			Promise.this.awaitCancellation(cancellationResponse);
 		}
 	}
