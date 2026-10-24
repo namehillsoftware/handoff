@@ -2,6 +2,7 @@ package com.namehillsoftware.handoff.promises;
 
 import com.namehillsoftware.handoff.Message;
 import com.namehillsoftware.handoff.RespondingMessenger;
+import org.jspecify.annotations.NonNull;
 
 abstract class EventuallyRespondingMessenger<Resolution, Response>
 extends
@@ -10,7 +11,7 @@ implements
 	RespondingMessenger<Resolution> {
 
 	@Override
-	public final void respond(Message<Resolution> message) {
+	public final void respond(@NonNull Message<Resolution> message) {
 		try {
 			if (message.rejection == null)
 				respond(message.resolution);

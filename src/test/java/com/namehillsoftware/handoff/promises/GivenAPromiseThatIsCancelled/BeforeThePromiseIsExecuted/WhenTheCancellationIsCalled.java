@@ -3,6 +3,7 @@ package com.namehillsoftware.handoff.promises.GivenAPromiseThatIsCancelled.Befor
 import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.MessengerOperator;
 import com.namehillsoftware.handoff.promises.Promise;
+import org.jspecify.annotations.NonNull;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,6 +34,6 @@ public class WhenTheCancellationIsCalled {
 	private static class ExternallyResolvableOperator<TResult> implements MessengerOperator<TResult> {
 
         @Override
-		public void send(Messenger<TResult> messenger) {}
+		public void send(@NonNull Messenger<TResult> messenger) {}
 	}
 }

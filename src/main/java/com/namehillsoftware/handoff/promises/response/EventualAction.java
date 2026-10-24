@@ -1,7 +1,8 @@
 package com.namehillsoftware.handoff.promises.response;
 
 import com.namehillsoftware.handoff.promises.Promise;
+import org.jspecify.annotations.NonNull;
 
 public interface EventualAction {
-    Promise<?> promiseAction();
+	@NonNull Promise<?> promiseAction();
 }

@@ -5,6 +5,7 @@ import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.promises.propagation.CancellationProxy;
 import com.namehillsoftware.handoff.promises.response.EventualAction;
 import com.namehillsoftware.handoff.promises.response.ImmediateResponse;
+import org.jspecify.annotations.NonNull;
 
 class PromisedEventualAction<Resolution>
 extends
@@ -22,7 +23,7 @@ implements
 	}
 
 	@Override
-	public final void respond(Message<Resolution> message) {
+	public final void respond(@NonNull Message<Resolution> message) {
 		try {
 			final Promise<?> promisedAction = onFulfilled.promiseAction();
 			promisedAction.then(new InternalResolutionProxy<>(message), this);

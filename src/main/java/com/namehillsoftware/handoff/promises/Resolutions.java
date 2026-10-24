@@ -4,6 +4,7 @@ import com.namehillsoftware.handoff.Messenger;
 import com.namehillsoftware.handoff.promises.aggregation.AggregateCancellation;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedErrorExcuse;
 import com.namehillsoftware.handoff.promises.aggregation.CollectedResultsResolver;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +21,7 @@ final class Resolutions {
         }
 
 		@Override
-		public void send(Messenger<Collection<Resolution>> messenger) {
+		public void send(@NonNull Messenger<Collection<Resolution>> messenger) {
 			if (promises.isEmpty()) {
 				messenger.sendResolution(Collections.emptyList());
 				return;

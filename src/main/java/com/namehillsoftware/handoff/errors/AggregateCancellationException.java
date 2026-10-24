@@ -15,6 +15,7 @@ public class AggregateCancellationException extends CancellationException {
 		this.results = results;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <TResult> Collection<TResult> getResults() {
 		return (Collection<TResult>)results;
 	}

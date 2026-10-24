@@ -6,6 +6,7 @@ import com.namehillsoftware.handoff.cancellation.CancellationResponse;
 import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.errors.RejectionDropper;
 import com.namehillsoftware.handoff.promises.Promise;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CancellationException;
 
@@ -18,7 +19,7 @@ public class CancellationProxy extends Promise<Void> implements CancellationResp
 		awaitCancellation(new InternalCancellationResponse());
 	}
 
-	public final void doCancel(Cancellable cancellable) {
+	public final void doCancel(@NonNull Cancellable cancellable) {
 		// Drop rejections so they don't by default go to the unhandled exception handler
 		then(new ImmediateCancellationResponse(cancellable), RejectionDropper.Instance.get());
 	}

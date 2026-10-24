@@ -2,6 +2,7 @@ package com.namehillsoftware.handoff;
 
 import com.namehillsoftware.handoff.errors.HandoffStackTraceFiltering;
 import com.namehillsoftware.handoff.rejections.UnhandledRejectionsReceiver;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Queue;
@@ -27,7 +28,7 @@ public abstract class SingleMessageBroadcaster<Resolution> extends CancellableBr
 
 	private final AtomicReference<Message<Resolution>> atomicMessage = new AtomicReference<>();
 
-	protected final void awaitResolution(RespondingMessenger<Resolution> recipient) {
+	protected final void awaitResolution(@NonNull RespondingMessenger<Resolution> recipient) {
 		recipients.compareAndSet(unhandledErrorQueue, respondingMessengers);
 
 		unhandledErrorQueue = null;
@@ -66,7 +67,7 @@ public abstract class SingleMessageBroadcaster<Resolution> extends CancellableBr
 		private static final UnhandledRejectionDispatcher instance = new UnhandledRejectionDispatcher();
 
 		@Override
-		public void respond(Message message) {
+		public void respond(@NonNull Message message) {
 			if (message.rejection != null && unhandledRejectionsReceiver != null)
 				unhandledRejectionsReceiver.newUnhandledRejection(message.rejection);
 		}

@@ -4,6 +4,7 @@ import com.namehillsoftware.handoff.Message;
 import com.namehillsoftware.handoff.RespondingMessenger;
 import com.namehillsoftware.handoff.cancellation.CancellationSignal;
 import com.namehillsoftware.handoff.cancellation.CancellationToken;
+import org.jspecify.annotations.NonNull;
 
 abstract class ImmediatelyRespondingCancellableMessenger<Resolution, Response>
 extends
@@ -18,7 +19,7 @@ implements
 	}
 
 	@Override
-	public final void respond(Message<Resolution> message) {
+	public final void respond(@NonNull Message<Resolution> message) {
 		try {
 			if (message.rejection == null)
 				respond(message.resolution, cancellationToken);
