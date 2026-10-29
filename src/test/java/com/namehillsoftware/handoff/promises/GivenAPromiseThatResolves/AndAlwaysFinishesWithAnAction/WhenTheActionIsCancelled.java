@@ -23,10 +23,12 @@ public class WhenTheActionIsCancelled {
 
 	@BeforeClass
 	public static void before() throws InterruptedException {
+		final CountDownLatch cancellationReadyLatch = new CountDownLatch(1);
 		final CountDownLatch testReadyLatch = new CountDownLatch(1);
 
 		final Promise<String> promisedMustAction = new QueuedPromise<>(cs -> {
-			testReadyLatch.await();
+			testReadyLatch.countDown();
+			cancellationReadyLatch.await();
 			return "test";
 		}, TestExecutors.TEST_EXECUTOR)
 			.must((cancellationSignal) -> {
@@ -34,9 +36,10 @@ public class WhenTheActionIsCancelled {
 				isCalled = true;
 			});
 
+		testReadyLatch.await();
 		promisedMustAction.cancel();
 
-		testReadyLatch.countDown();
+		cancellationReadyLatch.countDown();
 
 		promisedMustAction.then(r -> nextReturningPromiseResult = r);
 	}
